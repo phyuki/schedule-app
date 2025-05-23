@@ -1,0 +1,23 @@
+{
+  "name": "package",
+  "version": "1.0.0",
+  "description": "Hello World!",
+  "license": "ISC",
+  "author": "Pedro Henrique",
+  "type": "commonjs",
+  "main": "main",
+  "scripts": {
+    "start": "electron .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "electron": "^35.2.1"
+  },
+  "dependencies": {
+    "@sequelize/core": "^7.0.0-alpha.42",
+    "@sequelize/sqlite3": "^7.0.0-alpha.46",
+    "knex": "^3.1.0",
+    "sequelize": "^6.37.7",
+    "sqlite3": "^5.1.7"
+  }
+}
