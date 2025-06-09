@@ -8,12 +8,17 @@
   "main": "main",
   "scripts": {
     "start": "electron .",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "electron .",
+    "build-renderer": "next build && next export",
+    "build": "npm run build-renderer && electron-builder"
   },
   "devDependencies": {
     "electron": "^35.2.1"
   },
   "dependencies": {
+    "@fullcalendar/core": "^6.1.17",
+    "@fullcalendar/react": "^6.1.17",
+    "@fullcalendar/timegrid": "^6.1.17",
     "@sequelize/core": "^7.0.0-alpha.42",
     "@sequelize/sqlite3": "^7.0.0-alpha.46",
     "knex": "^3.1.0",

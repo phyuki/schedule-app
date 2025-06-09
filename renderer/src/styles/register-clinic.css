@@ -5,7 +5,6 @@ html, body {
 }
 
 body {
-    background-color: #B2D9C4;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -28,35 +27,33 @@ body {
     display: none;
 }
 
-#img-wrapper {
-    width: 170px;
-    height: 170px;
+.icon {
+    width: 176px;
+    height: 176px;
     border: 3px solid #247D7F;
     border-radius: 100%;
 }
 
 #preview-img {
-    width: 90px;
-    height: 90px;
     padding: 40px;
     margin-top: 0px;
-    border-radius: 100%;
     background-color: white;
+    border-radius: 100%;
     cursor: pointer;
 }
 
 #preview-img:hover {
-    background-color: rgb(150, 150, 150);
+    background-color: lightgray;
     opacity: 0.45;
 }
 
-#clinic-name {
-    width: 380px;
-    height: 40px;
+.clinic-name {
+    width: 400px;
+    height: 50px;
     border: none;
     border-radius: 80px;
-    padding-left: 15px;
-    font-size: 14px;
+    padding-left: 20px;
+    font-size: 15px;
     background-color: #247D7F;
     color: white;
 }
@@ -67,6 +64,7 @@ body {
     border-radius: 80px;
     background-color: #247D7F;
     cursor: pointer;
+    font-size: 15px;
     color: white;
 }
 

@@ -1,19 +1,22 @@
 const sequelize = require('../db');
 const { Op } = require('sequelize');
-const Session = require('../db/session.js');
+const Session = require('../models/session.js');
 
-async function findSessionsByProfessional( professionalId ) {
+async function findSessionsByProfessional( professionalId, activeWeek ) {
 
-    const today = new Date()
-    const nextWeek = new Date() 
-    nextWeek.setDate(today.getDate() + 7)
+    const {start, end} = activeWeek
+    
+    if(start === null || end === null){
+        console.error("Start or End can't be null")
+        return false
+    }
 
     try{
         const sessions = await Session.findAll({
             where: {
                 professionalId: professionalId,
                 date: {
-                    [Op.between]: [today, nextWeek]
+                    [Op.between]: [start, end]
                 }
             },
         })
@@ -24,4 +27,16 @@ async function findSessionsByProfessional( professionalId ) {
     }
 }
 
-module.exports = { findSessionsByProfessional }
+async function registerSession( session ) {
+
+    try {
+        const result = await Session.create(session)
+        return result
+    } catch (err) {
+        console.log("SQL Error: "+err)
+        return false
+    }
+
+}
+
+module.exports = { findSessionsByProfessional, registerSession }

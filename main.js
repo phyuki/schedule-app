@@ -2,6 +2,8 @@ const { app, BrowserWindow } = require('electron');
 const path = require('path');
 const { sequelize } = require('./models');
 
+const isDev = !app.isPackaged;
+
 async function createWindow() {
   await sequelize.sync()
   
@@ -16,11 +18,22 @@ async function createWindow() {
     }
   })
 
+  const startURL = isDev
+      ? 'http://localhost:3000'
+      : `file://${path.join(__dirname, '../renderer/out/index.html')}`;
+
   win.maximize()
-  win.loadFile('./renderer/register-professional.html')
+  win.loadURL(startURL);
+
+  win.on('closed', () => (mainWindow = null));
 }
 
 app.whenReady().then(() => {
+  if (isDev) {
+    const childProcess = require('child_process');
+    childProcess.exec('npm run dev', { cwd: path.join(__dirname, '../renderer') });
+  }
+
   createWindow()
 
   app.on('activate', () => {
