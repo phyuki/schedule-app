@@ -64,3 +64,8 @@ html, body {
 .button:hover {
     background-color: #207172;
 }
+
+.button:disabled {
+    cursor:default;
+    background-color: grey;
+}

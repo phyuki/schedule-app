@@ -1,5 +1,5 @@
 const { contextBridge } = require('electron');
-const {searchClinic, createClinic} = require('./service/clinic-service');
+const { searchClinic, createClinic } = require('./service/clinic-service');
 const { saveProfessional, fetchAllProfessionals, searchProfessionals } = require('./service/professional-service');
 const { findSessionsByProfessional, registerSession } = require('./service/session-service');
 const { searchPatients } = require('./service/patient-service');

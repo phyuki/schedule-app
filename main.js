@@ -1,6 +1,6 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
-const { sequelize } = require('./models');
+const { sequelize, Session } = require('./models');
 
 const isDev = !app.isPackaged;
 

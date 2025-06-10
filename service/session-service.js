@@ -31,7 +31,7 @@ async function registerSession( session ) {
 
     try {
         const result = await Session.create(session)
-        return result
+        return !!result
     } catch (err) {
         console.log("SQL Error: "+err)
         return false

@@ -1,5 +1,3 @@
-'use client'
-
 import FullCalendar from "@fullcalendar/react";
 import timeGridPlugin from '@fullcalendar/timegrid';
 import { useEffect, useRef, useState } from "react";
@@ -20,8 +18,8 @@ export default function Schedule () {
     const [modalVisible, setModalVisible] = useState(false)
     const [sessionProf, setSessionProf] = useState(null)
     const [inputSessionProf, setInputSessionProf] = useState('')
-    const [sessionPatient, setSessionPatient] = useState('')
-
+    const [sessionPatient, setSessionPatient] = useState(null)
+    const [inputSessionPatient, setInputSessionPatient] = useState('')
     const [events, setEvents] = useState([])
     const [loading, setLoading] = useState(false)
     const [activeRange, setActiveRange] = useState({start: '', end: ''})
@@ -62,8 +60,8 @@ export default function Schedule () {
     }, [inputSessionProf])
 
     useEffect(() => {
-        changeInput(sessionPatient, setPatients, fetchPatients)
-    }, [sessionPatient])
+        changeInput(inputSessionPatient, setPatients, fetchPatients)
+    }, [inputSessionPatient])
 
     const showDayHeaderContent = (args) => {
         const date = args.date
@@ -121,7 +119,9 @@ export default function Schedule () {
         }
     }
 
-    const registerSession = async () => {
+    const registerSession = async (event) => {
+        event.preventDefault()
+
         const session = {
             subject: sessionSubject,
             date: sessionDate.format('YYYY-MM-DD'),
@@ -131,14 +131,20 @@ export default function Schedule () {
             professionalId: sessionProf.id
         }
 
-        const savedSession = await window.sessionAPI.registerSession(session)
-        if(savedSession) {
-            alert("Consulta marcada com sucesso!")
-            const activeWeek = fetchCalendarWeek()
-            fetchSessions(scheduleProf.id, activeWeek)
-            changeModalVisible()
-        } else {
-            alert("Não foi possível marcar esta consulta!")
+        try {
+            const response = await window.sessionAPI.registerSession(session)
+            if(response) {
+                alert("Consulta marcada com sucesso!")
+                const activeWeek = fetchCalendarWeek()
+                fetchSessions(scheduleProf.id, activeWeek)
+                changeModalVisible()
+            } else {
+                alert("Não foi possível marcar esta consulta - Tente Novamente!")
+                console.log(response)
+            }
+        } catch (err) {
+            console.log(err)
+            return
         }
     }
 
@@ -174,58 +180,60 @@ export default function Schedule () {
         <div>
             {modalVisible && 
                 <Modal callback={changeModalVisible}>
-                    <TextField 
-                        label="Motivo da consulta"
-                        value={sessionSubject}
-                        onChange={(event) => setSessionSubject(event.target.value)}
-                    />
-                    <Autocomplete 
-                        disablePortal
-                        options={professionals}
-                        value={sessionProf}
-                        getOptionLabel={(option) => option ? option.name : option}
-                        onInputChange={(event, input) => setInputSessionProf(input)}
-                        onChange={(event, selectedOption) => setSessionProf(selectedOption)}
-                        loading={loading}
-                        sx={{width: 300}}
-                        noOptionsText='Nenhum professional encontrado'
-                        renderInput={(params) => <TextField {...params} label="Profissional" />}
-                    />
-                    <Autocomplete 
-                        disablePortal
-                        options={patients}
-                        getOptionLabel={(option) => option.name}
-                        onInputChange={(event, input) => setSessionPatient(input)}
-                        onChange={(event, selectedOption) => setSessionPatient(selectedOption)}
-                        loading={loading}
-                        sx={{width: 300}}
-                        noOptionsText='Nenhum paciente encontrado'
-                        renderInput={(params) => <TextField {...params} label="Paciente" />}
-                    />
-                    <DatePicker 
-                        label='Data da consulta'
-                        value={sessionDate}
-                        onChange={(input) => setSessionDate(input)}
-                        minDate={dayjs()}
-                        format="DD/MM/YYYY"
-                    />
-                    <TimeField 
-                        label="Início"
-                        value={sessionStartTime}
-                        onChange={(input) => setSessionStartTime(input)}
-                        format="HH:mm"
-                        minTime={dayjs().hour(7).minute(59)}
-                        maxTime={dayjs().hour(18).minute(0)}
-                    />
-                    <TimeField 
-                        label='Fim'
-                        value={sessionEndTime}
-                        onChange={(input) => setSessionEndTime(input)}
-                        format="HH:mm"
-                        minTime={formatSessionStartTime()}
-                        maxTime={dayjs().hour(18).minute(0)}
-                    />
-                    <button className="button" onClick={registerSession}>Salvar</button>
+                    <form onSubmit={registerSession}>
+                        <TextField 
+                            label="Motivo da consulta"
+                            value={sessionSubject}
+                            onChange={(event) => setSessionSubject(event.target.value)}
+                        />
+                        <Autocomplete 
+                            disablePortal
+                            options={professionals}
+                            value={sessionProf}
+                            getOptionLabel={(option) => option ? option.name : option}
+                            onInputChange={(event, input) => setInputSessionProf(input)}
+                            onChange={(event, selectedOption) => setSessionProf(selectedOption)}
+                            loading={loading}
+                            sx={{width: 300}}
+                            noOptionsText='Nenhum professional encontrado'
+                            renderInput={(params) => <TextField {...params} label="Profissional" />}
+                        />
+                        <Autocomplete 
+                            disablePortal
+                            options={patients}
+                            getOptionLabel={(option) => option.name}
+                            onInputChange={(event, input) => setInputSessionPatient(input)}
+                            onChange={(event, selectedOption) => setSessionPatient(selectedOption)}
+                            loading={loading}
+                            sx={{width: 300}}
+                            noOptionsText='Nenhum paciente encontrado'
+                            renderInput={(params) => <TextField {...params} label="Paciente" />}
+                        />
+                        <DatePicker 
+                            label='Data da consulta'
+                            value={sessionDate}
+                            onChange={(input) => setSessionDate(input)}
+                            minDate={dayjs()}
+                            format="DD/MM/YYYY"
+                        />
+                        <TimeField 
+                            label="Início"
+                            value={sessionStartTime}
+                            onChange={(input) => setSessionStartTime(input)}
+                            format="HH:mm"
+                            minTime={dayjs().hour(7).minute(59)}
+                            maxTime={dayjs().hour(18).minute(0)}
+                        />
+                        <TimeField 
+                            label='Fim'
+                            value={sessionEndTime}
+                            onChange={(input) => setSessionEndTime(input)}
+                            format="HH:mm"
+                            minTime={formatSessionStartTime()}
+                            maxTime={dayjs().hour(18).minute(0)}
+                        />
+                        <input type="submit" className="button" value="Salvar" />
+                    </form>
                 </Modal>
             }
             <div className="row-flex center header-content">
