@@ -2,10 +2,14 @@ const sequelize = require('../db');
 const { Op } = require('sequelize');
 const Professional = require('../models/professional.js');
 
-async function saveProfessional( professional ) {
+async function createProfessional( professional ) {
     try {
         const result = await Professional.create(professional)
-        return result !== null && result !== undefined
+        if(result && result.dataValues) {
+            return result.dataValues.id
+        } else {
+            return false
+        }
     } catch (err) {
         console.log("SQL Error: " + err)
         return false
@@ -36,4 +40,21 @@ async function searchProfessionals( search ) {
     }
 }
 
-module.exports = { saveProfessional, fetchAllProfessionals, searchProfessionals }
+async function updateProfessional( professionalId, professional ) {
+    try {
+        const result = await Professional.update(
+            professional,
+            { where: {id: professionalId} }
+        )
+        return !!result
+    } catch (err) {
+        console.log("SQL Error: "+err)
+        return false
+    }
+}
+
+module.exports = { 
+    createProfessional, 
+    fetchAllProfessionals, 
+    searchProfessionals, 
+    updateProfessional }

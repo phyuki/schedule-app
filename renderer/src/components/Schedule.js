@@ -132,7 +132,7 @@ export default function Schedule () {
         }
 
         try {
-            const response = await window.sessionAPI.registerSession(session)
+            const response = await window.sessionAPI.createSession(session)
             if(response) {
                 alert("Consulta marcada com sucesso!")
                 const activeWeek = fetchCalendarWeek()

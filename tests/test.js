@@ -7,7 +7,7 @@ const Professional = require('../models/professional')
 const Session = require('../models/session')
 
 const { searchClinic } = require('../service/clinic-service')
-const { saveProfessional } = require('../service/professional-service')
+const { createProfessional } = require('../service/professional-service')
 const { findSessionsByProfessional } = require('../service/session-service')
 
 async function testSearchClinic() {
@@ -106,4 +106,20 @@ async function testFindSessionsByProfessional() {
 
 }
 
-testFindSessionsByProfessional()
+async function testCreateProfessional() {
+    await sequelize.authenticate()
+        console.log('Conexão estabelecida')
+        
+    await sequelize.drop()
+    await sequelize.sync()
+
+    const professional = {
+        name: "João da Silva",
+        address: "Rua ABC, 123",
+        phone: "73999839999"
+    }
+    const result = await createProfessional(professional)
+    console.log(result)
+}
+
+testCreateProfessional()

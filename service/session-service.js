@@ -27,7 +27,7 @@ async function findSessionsByProfessional( professionalId, activeWeek ) {
     }
 }
 
-async function registerSession( session ) {
+async function createSession( session ) {
 
     try {
         const result = await Session.create(session)
@@ -39,4 +39,4 @@ async function registerSession( session ) {
 
 }
 
-module.exports = { findSessionsByProfessional, registerSession }
+module.exports = { findSessionsByProfessional, createSession }

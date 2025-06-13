@@ -1,16 +1,9 @@
 import { Autocomplete, TextField } from "@mui/material"
-import { useState } from "react"
 
-export default function RegistrationForm ({ value, options, setSearchInput, setSelectedOption, noOptionsText, 
-                                            searchLabel, clearForm, handleSubmit, children }) {
-
-    const [loading, setLoading] = useState(false)
-    const [buttonLabel, setButtonLabel] = useState("Cadastrar")
-
-    const switchToRegister = () => {
-        clearForm()
-        setButtonLabel("Cadastrar")
-    }
+export default function RegistrationForm ({ value, options, setSearchInput, 
+                                            handleChange, loading, noOptionsText, 
+                                            searchLabel, switchToRegister, handleSubmit, 
+                                            children, isRegister }) {
     
     return (
         <div>
@@ -21,10 +14,7 @@ export default function RegistrationForm ({ value, options, setSearchInput, setS
                     options={options}
                     getOptionLabel={(option) => option ? option.name : option}
                     onInputChange={(event, input) => setSearchInput(input)}
-                    onChange={(event, selectedOption) => {
-                        setSelectedOption(selectedOption)
-                        setButtonLabel("Atualizar")
-                    }}
+                    onChange={handleChange}
                     loading={loading}
                     sx={{width: 300}}
                     noOptionsText={noOptionsText}
@@ -32,9 +22,10 @@ export default function RegistrationForm ({ value, options, setSearchInput, setS
                 />
                 <button className="button" onClick={switchToRegister}>+</button>
             </div>
-            <form onSubmit={handleSubmit}>
+            <form className="column-flex center" onSubmit={handleSubmit}>
                 {children}
-                <input type="submit" className="button" value={buttonLabel} />
+                <input type="submit" className="button" 
+                       value={isRegister ? "Cadastrar" : "Atualizar"} />
             </form>
         </div>
     )
