@@ -17,4 +17,38 @@ async function searchPatients( search ) {
     }
 }
 
-module.exports = { searchPatients }
+async function createPatient( patient ) {
+    try {
+        const result = await Patient.create(patient)
+        if(result && result.dataValues) {
+            return result.dataValues.id
+        } else {
+            return false
+        }
+    } catch (err) {
+        console.log("SQL Error: " + err)
+        return false
+    }
+}
+
+
+async function updatePatient( patientId, patient ) {
+    try {
+        const result = await Patient.update(
+            patient,
+            { where: {id: patientId} }
+        )
+        return !!result
+    } catch (err) {
+        console.log("SQL Error: "+err)
+        return false
+    }
+}
+
+
+
+module.exports = { 
+    searchPatients,
+    createPatient,
+    updatePatient
+}

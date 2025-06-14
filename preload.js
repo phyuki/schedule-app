@@ -2,7 +2,7 @@ const { contextBridge } = require('electron');
 const { searchClinic, createClinic } = require('./service/clinic-service');
 const { createProfessional, fetchAllProfessionals, searchProfessionals, updateProfessional } = require('./service/professional-service');
 const { findSessionsByProfessional, createSession } = require('./service/session-service');
-const { searchPatients } = require('./service/patient-service');
+const { searchPatients, createPatient, updatePatient } = require('./service/patient-service');
 
 contextBridge.exposeInMainWorld('clinicAPI', {
     createClinic: async (clinic) => await createClinic(clinic),
@@ -22,7 +22,9 @@ contextBridge.exposeInMainWorld('sessionAPI', {
 })
 
 contextBridge.exposeInMainWorld('patientAPI', {
-    searchPatients: async (search) => await searchPatients(search)
+    searchPatients: async (search) => await searchPatients(search),
+    createPatient: async (patient) => await createPatient(patient),
+    updatePatient: async (patientId, patient) => await updatePatient(patientId, patient)
 })
 
 console.log('Preload carregado!')

@@ -1,44 +1,44 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import RegistrationForm from "./RegistrationForm";
 import { TextField } from "@mui/material";
 
-export default function RegistrationProf() {
-    
+export default function RegistrationPatient() {
+
     const [name, setName] = useState('')
     const [address, setAddress] = useState('')
     const [phone, setPhone] = useState('')
 
-    async function fetchProfessionals(search) {
-        return window.professionalAPI.searchProfessionals(search)
+    async function fetchPatients(search) {
+        return window.patientAPI.searchPatients(search)
     }
 
-    async function createProfessional() {
-        const professional = {name, address, phone}
-        const result = await window.professionalAPI.createProfessional(professional)
+    async function createPatient() {
+        const patient = {name, address, phone}
+        const result = await window.patientAPI.createPatient(patient)
+
+        if(result)
+            return {...patient, id: result}
+
+        return result
+    }
+
+    async function updatePatient(patientId) {
+        const patient = {name, address, phone}
+        const result = await window.patientAPI.updatePatient(patientId, patient)
         
         if(result)
-            return {...professional, id: result}
+            return {...patient, id: patientId}
 
         return result
     }
 
-    async function updateProfessional(professionalId) {
-        const professional = {name, address, phone}
-        const result = await window.professionalAPI.updateProfessional(professionalId, professional)
-    
-        if(result)
-            return {...professional, id: professionalId}
-
-        return result
-    }
-
-    function changeFormItems(professional) {
+    function changeFormItems(patient) {
         let newName = '', newAddress = '', newPhone = ''
         
-        if(professional) {
-            newName = professional.name
-            newAddress = professional.address
-            newPhone = professional.phone
+        if(patient) {
+            newName = patient.name
+            newAddress = patient.address
+            newPhone = patient.phone
         }
 
         setName(newName)
@@ -48,11 +48,11 @@ export default function RegistrationProf() {
 
     return (
         <RegistrationForm 
-            searchLabel={"Profissional"}
-            noOptionsText={"Nenhum profissional encontrado"}
-            fetchOptions={fetchProfessionals}
-            createItem={createProfessional}
-            updateItem={updateProfessional}
+            searchLabel={"Paciente"}
+            noOptionsText={"Nenhum paciente encontrado"}
+            fetchOptions={fetchPatients}
+            createItem={createPatient}
+            updateItem={updatePatient}
             changeFormItems={changeFormItems}
         >
             <TextField 

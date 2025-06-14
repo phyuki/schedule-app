@@ -9,6 +9,7 @@ import { useState } from "react"
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import RegistrationProf from "@/components/RegistrationProf";
+import RegistrationPatient from "@/components/RegistrationPatient"
 
 export default function Page () {
 
@@ -20,6 +21,8 @@ export default function Page () {
                 return <Schedule />
             case 'professionals':
                 return <RegistrationProf />
+            case 'patients':
+                return <RegistrationPatient />
             default:
                 return <p>{content}</p>
         }

@@ -57,4 +57,5 @@ module.exports = {
     createProfessional, 
     fetchAllProfessionals, 
     searchProfessionals, 
-    updateProfessional }
+    updateProfessional 
+}
