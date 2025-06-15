@@ -1,15 +1,18 @@
-import { Autocomplete, TextField } from "@mui/material"
+import { Autocomplete, Snackbar, TextField } from "@mui/material"
 import { useEffect, useState } from "react"
 
 export default function RegistrationForm ({ 
     searchLabel, noOptionsText, fetchOptions, 
     createItem, updateItem, changeFormItems, 
-    children 
+    validateFields, children 
 }) {
     
     const [options, setOptions] = useState([])
     const [searchInput, setSearchInput] = useState('')
     const [selected, setSelected] = useState(null)
+    
+    const [snackbarOpen, setSnackbarOpen] = useState(false)
+    const [snackbarMessage, setSnackbarMessage] = useState('')
     const [loading, setLoading] = useState(false)
     const [isRegister, setIsRegister] = useState(true)
     
@@ -51,31 +54,45 @@ export default function RegistrationForm ({
     async function registerOption( event ) {
         event.preventDefault()
         
-        let result = false, successMessage
+        const validation = validateFields()
+        
+        if(validation) {
+            let result = false, successMessage
 
-        if(isRegister) {
-            result = await createItem()
-            successMessage = `${searchLabel} cadastrado com sucesso!`
+            if(isRegister) {
+                result = await createItem()
+                successMessage = `${searchLabel} cadastrado com sucesso!`
+            } else {
+                const id = selected.id
+                result = await updateItem(id)
+                successMessage = "Dados atualizados com sucesso!"
+            }
+
+            if(result) {
+                setSnackbarMessage(successMessage)
+                setOptions([result])
+                setSelected(result)
+                
+                if(isRegister) 
+                    setIsRegister(false)
+            } else {
+                setSnackbarMessage("Não foi possível efetuar esta operação - Tente Novamente!")
+            }
         } else {
-            const id = selected.id
-            result = await updateItem(id)
-            successMessage = "Dados atualizados com sucesso!"
+            setSnackbarMessage("Preencha todos os campos obrigatórios!")
         }
 
-        if(result) {
-            alert(successMessage)
-            setOptions([result])
-            setSelected(result)
-            
-            if(isRegister) 
-                setIsRegister(false)
-        } else {
-            alert("Não foi possível efetuar esta operação - Tente Novamente!")
-        }
+        setSnackbarOpen(true)
     }
 
     return (
         <div>
+            <Snackbar 
+                open={snackbarOpen}
+                autoHideDuration={3000}
+                onClose={() => setSnackbarOpen(false)}
+                message={snackbarMessage}
+            />
             <div className="row-flex center">
                 <Autocomplete 
                     disablePortal

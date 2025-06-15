@@ -8,6 +8,10 @@ export default function RegistrationPatient() {
     const [address, setAddress] = useState('')
     const [phone, setPhone] = useState('')
 
+    const [nameError, setNameError] = useState('')
+    const [addressError, setAddressError] = useState('')
+    const [phoneError, setPhoneError] = useState('')
+
     async function fetchPatients(search) {
         return window.patientAPI.searchPatients(search)
     }
@@ -32,6 +36,24 @@ export default function RegistrationPatient() {
         return result
     }
 
+    const validateIsEmpty = (field, setFieldError) => {
+        if(field.trim() === '') {
+            setFieldError('Campo obrigatório')
+            return false
+        } else {
+            setFieldError('')
+            return true
+        }
+    }
+
+    const validateFields = () => {
+        const validateName = validateIsEmpty(name, setNameError)
+        const validateAddress = validateIsEmpty(address, setAddressError)
+        const validatePhone = validateIsEmpty(phone, setPhoneError)
+
+        return validateName && validateAddress && validatePhone
+    }
+
     function changeFormItems(patient) {
         let newName = '', newAddress = '', newPhone = ''
         
@@ -54,21 +76,28 @@ export default function RegistrationPatient() {
             createItem={createPatient}
             updateItem={updatePatient}
             changeFormItems={changeFormItems}
+            validateFields={validateFields}
         >
             <TextField 
                 label="Nome completo"
                 value={name}
                 onChange={(event) => setName(event.target.value)}
+                error={!!nameError}
+                helperText={nameError}
             />
             <TextField 
                 label="Endereço"
                 value={address}
                 onChange={(event) => setAddress(event.target.value)}
+                error={!!addressError}
+                helperText={addressError}
             />
             <TextField 
                 label="Telefone"
                 value={phone}
                 onChange={(event) => setPhone(event.target.value)}
+                error={!!phoneError}
+                helperText={phoneError}
             />
         </RegistrationForm>
     )
