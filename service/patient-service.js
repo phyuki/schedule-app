@@ -1,5 +1,5 @@
 const sequelize = require('../db');
-const { Op } = require('sequelize');
+const { Op, fn, col } = require('sequelize');
 const Patient = require('../models/patient.js');
 
 async function searchPatients( search ) {
@@ -8,7 +8,8 @@ async function searchPatients( search ) {
         const patients = await Patient.findAll({
             where: {
                 name: { [Op.like]:  `%${search}%`}
-            }
+            },
+            order: [ [fn('LOWER', col('name')), 'ASC'] ]
         })
         return patients.map((patient) => patient.dataValues)
     } catch (err) {

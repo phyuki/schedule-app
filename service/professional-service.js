@@ -31,7 +31,8 @@ async function searchProfessionals( search ) {
         const professionals = await Professional.findAll({
             where: {
                 name: { [Op.like]:  `%${search}%`}
-            }
+            },
+            order: ['name']
         })
         return professionals.map((prof) => prof.dataValues)
     } catch (err) {
