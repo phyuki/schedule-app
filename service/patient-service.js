@@ -9,7 +9,8 @@ async function searchPatients( search ) {
             where: {
                 name: { [Op.like]:  `%${search}%`}
             },
-            order: [ [fn('LOWER', col('name')), 'ASC'] ]
+            order: [ [fn('LOWER', col('name')), 'ASC'] ],
+            limit: 6
         })
         return patients.map((patient) => patient.dataValues)
     } catch (err) {

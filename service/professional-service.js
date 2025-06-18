@@ -32,7 +32,8 @@ async function searchProfessionals( search ) {
             where: {
                 name: { [Op.like]:  `%${search}%`}
             },
-            order: ['name']
+            order: ['name'],
+            limit: 6
         })
         return professionals.map((prof) => prof.dataValues)
     } catch (err) {
