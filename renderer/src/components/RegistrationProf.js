@@ -1,6 +1,8 @@
 import { useState } from "react";
-import RegistrationForm from "./RegistrationForm";
 import { TextField } from "@mui/material";
+
+import RegistrationForm from "./RegistrationForm";
+import PhoneInput from "./PhoneInput";
 
 export default function RegistrationProf() {
     
@@ -92,11 +94,9 @@ export default function RegistrationProf() {
                 error={!!addressError}
                 helperText={addressError}
             />
-            <TextField 
-                label="Telefone"
+            <PhoneInput 
                 value={phone}
                 onChange={(event) => setPhone(event.target.value)}
-                error={!!phoneError}
                 helperText={phoneError}
             />
         </RegistrationForm>

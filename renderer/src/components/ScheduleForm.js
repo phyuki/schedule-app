@@ -5,36 +5,34 @@ import dayjs from 'dayjs';
 import 'dayjs/locale/pt-br';
 
 import { useEffect, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 
 export default function ScheduleForm({ setModalVisible, initialProf, refreshSessions }) {
+
+    const { register, control, handleSubmit, watch, reset, formState: { errors } } = useForm({
+        defaultValues: {
+            subject: '',
+            professional: initialProf,
+            patient: null,
+            date: null,
+            startTime: null,
+            endTime: null
+        }
+    })
+
+    const startTime = watch('startTime')
+    const selectedProf = watch('professional')
 
     const [professionals, setProfessionals] = useState([initialProf])
     const [patients, setPatients] = useState([])
 
-    const [subject, setSubject] = useState('')
-    const [selectedProf, setSelectedProf] = useState(initialProf)
-    const [inputSelectedProf, setInputSelectedProf] = useState('')
-    const [selectedPatient, setSelectedPatient] = useState(null)
+    const [inputSelectedProf, setInputSelectedProf] = useState(initialProf?.name ?? '')
     const [inputSelectedPatient, setInputSelectedPatient] = useState('')
-    const [date, setDate] = useState(null)
-    const [startTime, setStartTime] = useState(null)
-    const [endTime, setEndTime] = useState(null)
-    
-    const [subjectError, setSubjectError] = useState('')
-    const [profError, setProfError] = useState('')
-    const [patientError, setPatientError] = useState('')
-    const [dateError, setDateError] = useState('')
-    const [startTimeError, setStartTimeError] = useState('')
-    const [endTimeError, setEndTimeError] = useState('')
 
     const [snackbarOpen, setSnackbarOpen] = useState(false)
     const [snackbarMessage, setSnackbarMessage] = useState('')
     const [loadingProf, setLoadingProf] = useState(false)
     const [loadingPatient, setLoadingPatient] = useState(false)
-
-    useEffect(() => {
-        console.log({subject, selectedProf, selectedPatient, date, startTime, endTime})
-    }, [])
 
     async function fetchProfessionals(search) {
         const result = await window.professionalAPI.searchProfessionals(search)
@@ -67,187 +65,194 @@ export default function ScheduleForm({ setModalVisible, initialProf, refreshSess
         changeInput(inputSelectedPatient, setLoadingPatient, setPatients, fetchPatients)
     }, [inputSelectedPatient])
 
-    const validateIsEmpty = (field, isString, setFieldError) => {
+    const validateIsEmpty = (field, isString) => {
         if(!field || (isString && field.trim() === '')) {
-            setFieldError('Campo obrigatório')
-            return false
+            return 'Campo obrigatório'
         } else {
-            setFieldError('')
             return true
         }
     }
 
-    const validateDateField = (date, setFieldError) => {
-        if(date && date.isAfter(dayjs(), 'day')) {
-            setFieldError('')
-            return true
-        } else {
-            setFieldError('Data inválida')
-            return false
-        }
+    const validateDateField = (date) => {
+        if(!date) return 'Campo obrigatório'
+        if(!date.isAfter(dayjs(), 'day')) return 'Data inválida'
+        else return true
     }
 
-    const validateTimeRange = (time, start, end, setFieldError) => {
-        if(time && time.isAfter(start.subtract(1, 'minute')) && time.isBefore(end.add(1, 'minute'))) {
-            setFieldError('')
-            return true
-        } else {
-            setFieldError('Horário inválido')
-            return false
-        }
-    }
+    const validateTimeRange = (time, startTime) => {
+        if(!time) return 'Campo obrigatório'
 
-    const validateFields = () => {
-        const validateSubject = validateIsEmpty(subject, true, setSubjectError)
-        const validateProf = validateIsEmpty(selectedProf, false, setProfError)
-        const validatePatient = validateIsEmpty(selectedPatient, false, setPatientError)
-        const validateDate = validateDateField(date, setDateError)
-        
-        const start = dayjs().hour(8).minute(0)
+        const start = startTime ?? dayjs().hour(8).minute(0)
         const end = dayjs().hour(18).minute(0)
 
-        const validateStartTime = validateTimeRange(startTime, start, end, setStartTimeError)
-        const validateEndTime = validateTimeRange(endTime, startTime, end, setEndTimeError)
+        if(!(time.isAfter(start.subtract(1, 'minute')) && time.isBefore(end.add(1, 'minute')))) 
+            return 'Horário inválido'
 
-        return validateSubject && validateProf && validatePatient 
-            && validateDate && validateStartTime && validateEndTime
+        else return true
     }
 
-    const registerSession = async (event) => {
-        event.preventDefault()
-
-        const validation = validateFields()
-
-        if(validation) {
-            const session = {
-                subject: subject,
-                date: date.format('YYYY-MM-DD'),
-                startTime: startTime.format('HH:mm:ss'),
-                endTime: endTime.format('HH:mm:ss'),
-                patientId: selectedPatient.id,
-                professionalId: selectedProf.id
-            }
-
-            try {
-                const response = await window.sessionAPI.createSession(session)
-                if(response) {
-                    setSnackbarMessage("Consulta marcada com sucesso!")
-                    refreshSessions(selectedProf)
-                } else {
-                    setSnackbarMessage("Não foi possível marcar esta consulta - Tente Novamente!")
-                    console.log(response)
-                }
-            } catch (err) {
-                console.log(err)
-                return
-            }
-        } else {
-            setSnackbarMessage("Preencha os campos apropriadamente!")
+    const onSubmit = async (data) => {
+        const session = {
+            subject: data.subject,
+            date: data.date.format('YYYY-MM-DD'),
+            startTime: startTime.format('HH:mm:ss'),
+            endTime: data.endTime.format('HH:mm:ss'),
+            patientId: data.patient.id,
+            professionalId: selectedProf.id
         }
 
-        setSnackbarOpen(true)
+        try {
+            const response = await window.sessionAPI.createSession(session)
+            if(response) {
+                setSnackbarMessage("Consulta marcada com sucesso!")
+                refreshSessions(selectedProf)
+            } else {
+                setSnackbarMessage("Não foi possível marcar esta consulta - Tente Novamente!")
+                console.log(response)
+            }
+        } catch (err) {
+            console.log(err)
+            return
+        }
+        
+        setSnackbarOpen(true) 
     }
 
-    const closeModal = async () => {
-        setSelectedProf(null)
+    const onError = (errors) => {
+        setSnackbarMessage("Preencha os campos apropriadamente!")
+        setSnackbarOpen(true) 
+    }
+
+    const handleCLose = async () => {
         setProfessionals([])
         setPatients([])
-        setSubject('')
-        setDate(null)
-        setStartTime(null)
-        setEndTime(null)
+        reset()
 
         setModalVisible(false)
     }
 
     return (
-        <Modal callback={closeModal}>
+        <Modal callback={handleCLose}>
             <Snackbar 
                 open={snackbarOpen}
                 autoHideDuration={3000}
                 onClose={() => setSnackbarOpen(false)}
                 message={snackbarMessage}
             />
-            <form onSubmit={registerSession}>
+            <form onSubmit={handleSubmit(onSubmit, onError)}>
                 <TextField 
                     label="Motivo da consulta"
-                    value={subject}
-                    onChange={(event) => setSubject(event.target.value)}
-                    error={!!subjectError}
-                    helperText={subjectError}
+                    {...register("subject", { validate: (value) => validateIsEmpty(value, true) })}
+                    error={!!errors.subject}
+                    helperText={errors.subject?.message}
                 />
-                <Autocomplete 
-                    disablePortal
-                    options={professionals}
-                    value={selectedProf}
-                    getOptionLabel={(option) => option ? option.name : option}
-                    onInputChange={(event, input) => setInputSelectedProf(input)}
-                    onChange={(event, selectedOption) => {
-                        setSelectedProf(selectedOption)
-                        setLoadingProf(false)
-                    }}
-                    loading={loadingProf}
-                    loadingText='Pesquisando...'
-                    sx={{width: 300}}
-                    noOptionsText='Nenhum professional encontrado'
-                    renderInput={(params) => 
-                        <TextField {...params} 
-                            label="Profissional" 
-                            error={!!profError}
-                            helperText={profError}
+                <Controller
+                    name="professional"
+                    control={control}
+                    rules={{ validate: (value) => validateIsEmpty(value, false) }}
+                    render={({ field }) => (
+                        <Autocomplete 
+                            {...field}
+                            disablePortal
+                            value={field.value}
+                            options={professionals}
+                            getOptionLabel={(option) => option ? option.name : option}
+                            onInputChange={(event, input) => setInputSelectedProf(input)}
+                            onChange={(_, value) => {
+                                field.onChange(value)
+                                setLoadingPatient(false)
+                            }}
+                            loading={loadingProf}
+                            loadingText='Pesquisando...'
+                            sx={{width: 300}}
+                            noOptionsText='Nenhum professional encontrado'
+                            renderInput={(params) => 
+                                <TextField {...params} 
+                                    label="Profissional" 
+                                    error={!!errors.professional}
+                                    helperText={errors.professional?.message}
+                                />
+                            }
                         />
-                    }
+                    )}
                 />
-                <Autocomplete 
-                    disablePortal
-                    options={patients}
-                    getOptionLabel={(option) => option.name}
-                    onInputChange={(event, input) => setInputSelectedPatient(input)}
-                    onChange={(event, selectedOption) => {
-                        setSelectedPatient(selectedOption)
-                        setLoadingPatient(false)
-                    }}
-                    loading={loadingPatient}
-                    loadingText='Pesquisando...'
-                    sx={{width: 300}}
-                    noOptionsText='Nenhum paciente encontrado'
-                    renderInput={(params) => 
-                        <TextField {...params} 
-                            label="Paciente" 
-                            error={!!patientError}
-                            helperText={patientError}
+                <Controller
+                    name="patient"
+                    control={control}
+                    rules={{ validate: (value) => validateIsEmpty(value, false) }}
+                    render={({ field }) => (
+                        <Autocomplete 
+                            {...field}
+                            disablePortal
+                            value={field.value}
+                            options={patients}
+                            getOptionLabel={(option) => option.name}
+                            onInputChange={(event, input) => setInputSelectedPatient(input)}
+                            onChange={(_, value) => {
+                                field.onChange(value)
+                                setLoadingPatient(false)
+                            }}
+                            loading={loadingPatient}
+                            loadingText='Pesquisando...'
+                            sx={{width: 300}}
+                            noOptionsText='Nenhum paciente encontrado'
+                            renderInput={(params) => 
+                                <TextField {...params} 
+                                    label="Paciente" 
+                                    error={!!errors.patient}
+                                    helperText={errors.patient?.message}
+                                />
+                            }
                         />
-                    }
+                    )}
                 />
-                <DatePicker 
-                    label='Data da consulta'
-                    value={date}
-                    onChange={(input) => setDate(input)}
-                    minDate={dayjs()}
-                    format="DD/MM/YYYY"
-                    slotProps={{
-                        textField:{
-                            error: !!dateError,
-                            helperText: dateError
-                        }
-                    }}
+                <Controller
+                    name="date"
+                    control={control}
+                    rules={{ validate: (value) => validateDateField(value) }}
+                    render={({ field }) => (
+                        <DatePicker 
+                            label='Data da consulta'
+                            {...field}
+                            minDate={dayjs()}
+                            format="DD/MM/YYYY"
+                            slotProps={{
+                                textField:{
+                                    error: !!errors.date,
+                                    helperText: errors.date?.message
+                                }
+                            }}
+                        />
+                    )} 
                 />
-                <TimeField 
-                    label='Início'
-                    value={startTime}
-                    onChange={(input) => setStartTime(input)}
-                    format="HH:mm"
-                    error={!!startTimeError}
-                    helperText={startTimeError}
+                <Controller
+                    name="startTime"
+                    control={control}
+                    rules={{ validate: (value) => validateTimeRange(value) }}
+                    render={({ field }) => (
+                        <TimeField 
+                            {...field}
+                            label='Início'
+                            format="HH:mm"
+                            error={!!errors.startTime}
+                            helperText={errors.startTime?.message}
+                        />
+                    )}
                 />
-                <TimeField 
-                    label='Fim'
-                    value={endTime}
-                    onChange={(input) => setEndTime(input)}
-                    format="HH:mm"
-                    error={!!endTimeError}
-                    helperText={endTimeError}
-                    
+                <Controller
+                    name="endTime"
+                    control={control}
+                    rules={{ validate: (value) => validateTimeRange(value, startTime) }}
+                    render={({ field }) => (
+                        <TimeField 
+                            {...field}
+                            label='Fim'
+                            format="HH:mm"
+                            disabled={!startTime}
+                            error={!!errors.endTime}
+                            helperText={errors.endTime?.message}
+                        />
+                    )}
                 />
                 <input type="submit" className="button" value="Salvar" />
             </form>

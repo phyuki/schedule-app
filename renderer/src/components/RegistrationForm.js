@@ -18,6 +18,7 @@ export default function RegistrationForm ({
     
     async function updateOptions() {
         const result = await fetchOptions(searchInput)
+        
         setOptions(result)
         if(result.length === 0) setLoading(false)
     }
@@ -42,6 +43,7 @@ export default function RegistrationForm ({
 
     function handleChange(event, selectedOption) {
         setSelected(selectedOption)
+        setLoading(false)
         if(selectedOption) {
             changeFormItems(selectedOption)
             setIsRegister(false)

@@ -84,9 +84,11 @@ export default function Schedule () {
 
     const refreshSessions = (professional) => {
         const activeWeek = fetchCalendarWeek()
+        console.log(professional)
         fetchSessions(professional.id, activeWeek)
         setProfessionals([professional])
         setScheduleProf(professional)
+        setInputScheduleProf(professional.name)
     }
     
     const handleChangeScheduleProf = async (event, selectedOption) => {
@@ -100,6 +102,8 @@ export default function Schedule () {
             setScheduleProf(null)
             setEvents([])
         }
+
+        setLoading(false)
     }
 
     return (
@@ -114,6 +118,8 @@ export default function Schedule () {
             <div className="row-flex center header-content">
                 <Autocomplete 
                         disablePortal
+                        value={scheduleProf}
+                        inputValue={inputScheduleProf}
                         options={professionals}
                         getOptionLabel={(option) => option ? option.name : option}
                         onInputChange={(event, input) => setInputScheduleProf(input)}
@@ -153,5 +159,4 @@ export default function Schedule () {
             />
         </div>
     )
-
 }
