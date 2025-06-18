@@ -47,7 +47,7 @@ export default function ScheduleForm({ setModalVisible, initialProf, refreshSess
     }
 
     const changeInput = (input, setLoading, callbackOptions, callbackFetch) => {
-        if(!input || input.length < 3) {
+        if(!input) {
             callbackOptions([])
             return
         } else {
@@ -75,47 +75,74 @@ export default function ScheduleForm({ setModalVisible, initialProf, refreshSess
 
     const validateDateField = (date) => {
         if(!date) return 'Campo obrigatório'
-        if(!date.isAfter(dayjs(), 'day')) return 'Data inválida'
+        if(date.isBefore(dayjs(), 'day')) return 'Data inválida'
         else return true
     }
 
-    const validateTimeRange = (time, startTime) => {
+    const validateTimeRange = (time, startTime, endTime) => {
         if(!time) return 'Campo obrigatório'
 
-        const start = startTime ?? dayjs().hour(8).minute(0)
-        const end = dayjs().hour(18).minute(0)
+        const start = startTime ?? dayjs().hour(7).minute(59)
+        const end = endTime ?? dayjs().hour(18).minute(1)
 
-        if(!(time.isAfter(start.subtract(1, 'minute')) && time.isBefore(end.add(1, 'minute')))) 
+        if(time.isAfter(start, 'minute') && time.isBefore(end, 'minute')) {
+            return undefined
+        } else {
             return 'Horário inválido'
+        }
+    }
 
-        else return true
+    const validateSessions = (sessions, newSession) => {
+        const {startTime, endTime} = newSession
+        const newStart = dayjs(startTime, 'HH:mm:ss')
+        const newEnd = dayjs(endTime, 'HH:mm:ss')
+
+        for(let session of sessions) {
+            const sessionStart = dayjs(session.startTime, 'HH:mm:ss')
+            const sessionEnd = dayjs(session.endTime, 'HH:mm:ss')
+
+            if(!(validateTimeRange(newStart, sessionStart, sessionEnd) && 
+                validateTimeRange(newEnd, sessionStart, sessionEnd))) {
+                    return false
+            }
+        }
+
+        return true
     }
 
     const onSubmit = async (data) => {
+
+        const formattedDate = data.date.format('YYYY-MM-DD')
+        const result = await window.sessionAPI.findSessionsByDate(selectedProf.id, formattedDate)
+        
         const session = {
             subject: data.subject,
-            date: data.date.format('YYYY-MM-DD'),
+            date: formattedDate,
             startTime: startTime.format('HH:mm:ss'),
             endTime: data.endTime.format('HH:mm:ss'),
             patientId: data.patient.id,
             professionalId: selectedProf.id
         }
 
-        try {
-            const response = await window.sessionAPI.createSession(session)
-            if(response) {
-                setSnackbarMessage("Consulta marcada com sucesso!")
-                refreshSessions(selectedProf)
-            } else {
-                setSnackbarMessage("Não foi possível marcar esta consulta - Tente Novamente!")
-                console.log(response)
+        if(validateSessions(result, session)) {
+            try {
+                const response = await window.sessionAPI.createSession(session)
+                if(response) {
+                    setSnackbarMessage("Consulta marcada com sucesso!")
+                    refreshSessions(selectedProf)
+                } else {
+                    setSnackbarMessage("Não foi possível marcar esta consulta - Tente Novamente!")
+                    console.log(response)
+                }
+            } catch (err) {
+                console.log(err)
+                return
             }
-        } catch (err) {
-            console.log(err)
-            return
+        } else {
+            setSnackbarMessage("Este horário não está disponível!")
         }
-        
-        setSnackbarOpen(true) 
+
+        setSnackbarOpen(true)
     }
 
     const onError = (errors) => {

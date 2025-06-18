@@ -25,12 +25,13 @@ export default function Schedule () {
     }
 
     const changeInput = (input, callbackOptions, callbackFetch) => {
-        if(!input || input.length < 3) {
+        if(!input) {
             callbackOptions([])
             return
+        } else {
+            setLoading(true)
         }
 
-        setLoading(true)
         callbackFetch(input)
     }
 

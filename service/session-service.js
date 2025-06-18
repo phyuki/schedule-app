@@ -27,6 +27,23 @@ async function findSessionsByProfessional( professionalId, activeWeek ) {
     }
 }
 
+async function findSessionsByDate( professionalId, date) {
+
+    try {
+        const sessions = await Session.findAll({
+            attributes: ['startTime', 'endTime'],
+            where: {
+                professionalId: professionalId,
+                date: date
+            },
+        })
+        return sessions.map((session) => session.dataValues)
+    } catch (err) {
+        console.log("SQL Error: "+err)
+        return false
+    }
+}
+
 async function createSession( session ) {
 
     try {
@@ -39,4 +56,4 @@ async function createSession( session ) {
 
 }
 
-module.exports = { findSessionsByProfessional, createSession }
+module.exports = { findSessionsByProfessional, findSessionsByDate, createSession }

@@ -18,18 +18,18 @@ export default function RegistrationForm ({
     
     async function updateOptions() {
         const result = await fetchOptions(searchInput)
-        
         setOptions(result)
         if(result.length === 0) setLoading(false)
     }
 
     useEffect(() => {
-        if(!searchInput || searchInput.length < 3) {
+        if(!searchInput) {
             setOptions([])
             return
-        }
+        } else {
+            setLoading(true)
+        } 
 
-        setLoading(true)
         updateOptions()
     }, [searchInput])                                            
 
