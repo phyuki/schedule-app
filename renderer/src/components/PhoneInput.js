@@ -26,7 +26,7 @@ export default function PhoneInput({ value, onChange, helperText }) {
             value={value}
             onChange={onChange}
             error={!!helperText}
-            helperText={helperText}
+            helperText={helperText?.message}
             slotProps={{
                 input: {
                     inputComponent: TextMaskCustom

@@ -9,7 +9,8 @@ import { Controller, useForm } from "react-hook-form";
 
 export default function ScheduleForm({ setModalVisible, initialProf, refreshSessions }) {
 
-    const { register, control, handleSubmit, watch, reset, formState: { errors } } = useForm({
+    const { register, control, handleSubmit, watch, 
+        reset, setError, clearErrors, formState: { errors } } = useForm({
         defaultValues: {
             subject: '',
             professional: initialProf,
@@ -139,9 +140,14 @@ export default function ScheduleForm({ setModalVisible, initialProf, refreshSess
                 return
             }
         } else {
+            const errorMessage = { type: "manual", message: "Horário ocupado" }
+            setError("date", errorMessage)
+            setError("startTime", errorMessage)
+            setError("endTime", errorMessage)
             setSnackbarMessage("Este horário não está disponível!")
         }
 
+        clearErrors([["date", "startTime", "endTime"]])
         setSnackbarOpen(true)
     }
 

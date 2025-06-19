@@ -3,23 +3,23 @@ import { TextField } from "@mui/material";
 
 import RegistrationForm from "./RegistrationForm";
 import PhoneInput from "./PhoneInput";
+import { Controller, useForm } from "react-hook-form";
 
 export default function RegistrationProf() {
     
-    const [name, setName] = useState('')
-    const [address, setAddress] = useState('')
-    const [phone, setPhone] = useState('')
-
-    const [nameError, setNameError] = useState('')
-    const [addressError, setAddressError] = useState('')
-    const [phoneError, setPhoneError] = useState('')
+    const {control, handleSubmit, setValue, reset, formState: { errors }} = useForm({
+        defaultValues: {
+            name: '',
+            address: '',
+            phone: ''
+        }
+    })
 
     async function fetchProfessionals(search) {
         return window.professionalAPI.searchProfessionals(search)
     }
 
-    async function createProfessional() {
-        const professional = {name, address, phone}
+    async function createProfessional(professional) {
         const result = await window.professionalAPI.createProfessional(professional)
         
         if(result)
@@ -28,8 +28,7 @@ export default function RegistrationProf() {
         return result
     }
 
-    async function updateProfessional(professionalId) {
-        const professional = {name, address, phone}
+    async function updateProfessional(professionalId, professional) {
         const result = await window.professionalAPI.updateProfessional(professionalId, professional)
     
         if(result)
@@ -38,36 +37,28 @@ export default function RegistrationProf() {
         return result
     }
 
-    const validateIsEmpty = (field, setFieldError) => {
+    const validateIsEmpty = (field) => {
         if(field.trim() === '') {
-            setFieldError('Campo obrigatório')
-            return false
+            return "Campo obrigatório"
         } else {
-            setFieldError('')
-            return true
+            return undefined
         }
     }
 
-    const validateFields = () => {
-        const validateName = validateIsEmpty(name, setNameError)
-        const validateAddress = validateIsEmpty(address, setAddressError)
-        const validatePhone = validateIsEmpty(phone, setPhoneError)
-
-        return validateName && validateAddress && validatePhone
+    const validatePhoneNumber = (field) => {
+        if(field.trim() === '') return "Campo obrigatório"
+        if(field.replace(/\D/g, '').length !== 11) return "Telefone incompleto"
+        else return undefined
     }
 
     function changeFormItems(professional) {
-        let newName = '', newAddress = '', newPhone = ''
-        
         if(professional) {
-            newName = professional.name
-            newAddress = professional.address
-            newPhone = professional.phone
+            setValue('name', professional.name, { shouldValidate: true })
+            setValue('address', professional.address, { shouldValidate: true })
+            setValue('phone', professional.phone, { shouldValidate: true })
+        } else {
+            reset()
         }
-
-        setName(newName)
-        setAddress(newAddress)
-        setPhone(newPhone)
     }
 
     return (
@@ -77,27 +68,46 @@ export default function RegistrationProf() {
             fetchOptions={fetchProfessionals}
             createItem={createProfessional}
             updateItem={updateProfessional}
+            handleSubmit={handleSubmit}
             changeFormItems={changeFormItems}
-            validateFields={validateFields}
         >
-            <TextField 
-                label="Nome completo"
-                value={name}
-                onChange={(event) => setName(event.target.value)}
-                error={!!nameError}
-                helperText={nameError}
+            <Controller
+                name="name"
+                control={control}
+                rules={{ validate: (value) => validateIsEmpty(value) }}
+                render={({ field, fieldState }) => 
+                    <TextField 
+                        {...field}
+                        label="Nome completo"
+                        error={!!fieldState.error}
+                        helperText={fieldState.error?.message}
+                    />
+                }
             />
-            <TextField 
-                label="Endereço"
-                value={address}
-                onChange={(event) => setAddress(event.target.value)}
-                error={!!addressError}
-                helperText={addressError}
+           <Controller
+                name="address"
+                control={control}
+                rules={{ validate: (value) => validateIsEmpty(value) }}
+                render={({ field, fieldState }) => 
+                    <TextField 
+                        {...field}
+                        label="Endereço"
+                        error={!!fieldState.error}
+                        helperText={fieldState.error?.message}
+                    />
+                }
             />
-            <PhoneInput 
-                value={phone}
-                onChange={(event) => setPhone(event.target.value)}
-                helperText={phoneError}
+            <Controller
+                name="phone"
+                control={control}
+                rules={{ validate: (value) => validatePhoneNumber(value) }}
+                render={({ field, fieldState }) => 
+                    <PhoneInput 
+                        value={field.value}
+                        onChange={field.onChange}
+                        helperText={fieldState.error}
+                    />
+                }
             />
         </RegistrationForm>
     )

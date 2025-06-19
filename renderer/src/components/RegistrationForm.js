@@ -3,8 +3,8 @@ import { useEffect, useState } from "react"
 
 export default function RegistrationForm ({ 
     searchLabel, noOptionsText, fetchOptions, 
-    createItem, updateItem, changeFormItems, 
-    validateFields, children 
+    createItem, updateItem, handleSubmit, 
+    changeFormItems, children 
 }) {
     
     const [options, setOptions] = useState([])
@@ -53,38 +53,35 @@ export default function RegistrationForm ({
         }
     }
 
-    async function registerOption( event ) {
-        event.preventDefault()
+    async function onSubmit( data ) {
         
-        const validation = validateFields()
-        
-        if(validation) {
-            let result = false, successMessage
+        let result = false, successMessage
 
-            if(isRegister) {
-                result = await createItem()
-                successMessage = `${searchLabel} cadastrado com sucesso!`
-            } else {
-                const id = selected.id
-                result = await updateItem(id)
-                successMessage = "Dados atualizados com sucesso!"
-            }
-
-            if(result) {
-                setSnackbarMessage(successMessage)
-                setOptions([result])
-                setSelected(result)
-                
-                if(isRegister) 
-                    setIsRegister(false)
-            } else {
-                setSnackbarMessage("Não foi possível efetuar esta operação - Tente Novamente!")
-            }
+        if(isRegister) {
+            result = await createItem(data)
+            successMessage = `${searchLabel} cadastrado com sucesso!`
         } else {
-            setSnackbarMessage("Preencha todos os campos obrigatórios!")
+            const id = selected.id
+            result = await updateItem(id, data)
+            successMessage = "Dados atualizados com sucesso!"
+        }
+
+        if(result) {
+            setSnackbarMessage(successMessage)
+            setOptions([result])
+            setSelected(result)
+            
+            if(isRegister) setIsRegister(false)
+        } else {
+            setSnackbarMessage("Não foi possível efetuar esta operação - Tente Novamente!")
         }
 
         setSnackbarOpen(true)
+    }
+
+    function onError( errors ) {
+        setSnackbarMessage("Preencha os campos apropriadamente!")
+        setSnackbarOpen(true) 
     }
 
     return (
@@ -110,7 +107,7 @@ export default function RegistrationForm ({
                 />
                 <button className="button" onClick={switchToRegister}>+</button>
             </div>
-            <form className="column-flex center" onSubmit={registerOption}>
+            <form className="column-flex center" onSubmit={handleSubmit(onSubmit, onError)}>
                 {children}
                 <input type="submit" className="button" 
                        value={isRegister ? "Cadastrar" : "Atualizar"} />
