@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { TextField } from "@mui/material";
 
 import RegistrationForm from "./RegistrationForm";
