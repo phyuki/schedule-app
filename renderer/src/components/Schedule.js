@@ -18,6 +18,8 @@ export default function Schedule () {
     const [events, setEvents] = useState([])
     const [activeRange, setActiveRange] = useState({start: '', end: ''})
 
+    const [selectedSession, setSelectedSession] = useState({})
+
     async function fetchProfessionals(search) {
         const result = await window.professionalAPI.searchProfessionals(search)
         setProfessionals(result)
@@ -50,13 +52,19 @@ export default function Schedule () {
         return `${weekday} ${day}/${month}`
     }
 
+    const formatName = (name) => {
+        const split = name.split(' ')
+        return `${split[0]} ${split[split.length - 1]}`
+    }
+
     const fetchSessions = async (profId, activeWeek) => {
         await window.sessionAPI.findSessionsByProfessional(profId, activeWeek).then((sessions) => {
             const formattedEvents = sessions.map((session) => {
-                const title = session.subject
+                const patient = formatName(session.patient.name)
+                const title = patient + " - " + session.subject
                 const start = session.date + "T" + session.startTime
                 const end = session.date + "T" + session.endTime
-                return {title, start, end}
+                return { title, start, end, extendedProps: session }
             })
             setEvents(formattedEvents)
         })
@@ -107,12 +115,18 @@ export default function Schedule () {
         setLoading(false)
     }
 
+    const handleCalendarEventClick = (info) => {
+        const { extendedProps } = info.event
+        setSelectedSession(extendedProps)
+        setModalVisible(true)
+    }
+
     return (
         <div>
             { modalVisible && 
                 <ScheduleForm 
                     setModalVisible={setModalVisible}
-                    initialProf={scheduleProf}
+                    defaultContent={selectedSession}
                     refreshSessions={refreshSessions}
                 /> 
             }
@@ -131,7 +145,13 @@ export default function Schedule () {
                         noOptionsText='Nenhum professional encontrado'
                         renderInput={(params) => <TextField {...params} label="Profissional" />}
                 />
-                <button className="button" onClick={() => setModalVisible(true)}>Marcar Apontamento</button>
+                <button 
+                    className="button" 
+                    onClick={() => {
+                        setSelectedSession({ professional: scheduleProf })
+                        setModalVisible(true)
+                    }}
+                >Marcar Apontamento</button>
             </div>
             <FullCalendar
                 plugins={[timeGridPlugin]}
@@ -157,6 +177,7 @@ export default function Schedule () {
                 ref={calendarRef}
                 datesSet={handleDatesSet}
                 events={events}
+                eventClick={handleCalendarEventClick}
             />
         </div>
     )

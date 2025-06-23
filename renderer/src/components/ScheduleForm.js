@@ -7,27 +7,27 @@ import 'dayjs/locale/pt-br';
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 
-export default function ScheduleForm({ setModalVisible, initialProf, refreshSessions }) {
+export default function ScheduleForm({ setModalVisible, defaultContent, refreshSessions }) {
 
     const { register, control, handleSubmit, watch, 
         reset, setError, clearErrors, formState: { errors } } = useForm({
         defaultValues: {
-            subject: '',
-            professional: initialProf,
-            patient: null,
-            date: null,
-            startTime: null,
-            endTime: null
+            subject: defaultContent.subject ?? '',
+            professional: defaultContent.professional ?? null,
+            patient: defaultContent.patient ?? null,
+            date: dayjs(defaultContent.date, 'YYYY-MM-DD') ?? null,
+            startTime: dayjs(defaultContent.startTime, 'HH:mm:ss') ?? null,
+            endTime: dayjs(defaultContent.endTime, 'HH:mm:ss') ?? null
         }
     })
 
     const startTime = watch('startTime')
     const selectedProf = watch('professional')
 
-    const [professionals, setProfessionals] = useState([initialProf])
-    const [patients, setPatients] = useState([])
+    const [professionals, setProfessionals] = useState([defaultContent.professional])
+    const [patients, setPatients] = useState([defaultContent.patient])
 
-    const [inputSelectedProf, setInputSelectedProf] = useState(initialProf?.name ?? '')
+    const [inputSelectedProf, setInputSelectedProf] = useState(defaultContent.professional?.name ?? '')
     const [inputSelectedPatient, setInputSelectedPatient] = useState('')
 
     const [snackbarOpen, setSnackbarOpen] = useState(false)
@@ -102,8 +102,12 @@ export default function ScheduleForm({ setModalVisible, initialProf, refreshSess
             const sessionStart = dayjs(session.startTime, 'HH:mm:ss')
             const sessionEnd = dayjs(session.endTime, 'HH:mm:ss')
 
-            if(!(validateTimeRange(newStart, sessionStart, sessionEnd) && 
-                validateTimeRange(newEnd, sessionStart, sessionEnd))) {
+            const validateNewSession = validateTimeRange(newStart.add(1, 'minute'), sessionStart, sessionEnd) && 
+                validateTimeRange(newEnd, sessionStart, sessionEnd)
+            const validateOldSession = validateTimeRange(sessionStart.add(1, 'minute'), newStart, newEnd) && 
+                validateTimeRange(sessionEnd, newStart, newEnd)
+
+            if(!(validateNewSession && validateOldSession)) {
                     return false
             }
         }
@@ -141,13 +145,12 @@ export default function ScheduleForm({ setModalVisible, initialProf, refreshSess
             }
         } else {
             const errorMessage = { type: "manual", message: "Horário ocupado" }
-            setError("date", errorMessage)
             setError("startTime", errorMessage)
             setError("endTime", errorMessage)
             setSnackbarMessage("Este horário não está disponível!")
         }
 
-        clearErrors([["date", "startTime", "endTime"]])
+        clearErrors([["startTime", "endTime"]])
         setSnackbarOpen(true)
     }
 

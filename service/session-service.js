@@ -1,6 +1,6 @@
 const sequelize = require('../db');
 const { Op } = require('sequelize');
-const Session = require('../models/session.js');
+const { Session, Patient, Professional } = require('../models');
 
 async function findSessionsByProfessional( professionalId, activeWeek ) {
 
@@ -19,8 +19,16 @@ async function findSessionsByProfessional( professionalId, activeWeek ) {
                     [Op.between]: [start, end]
                 }
             },
+            include: [
+                { model: Patient }, 
+                { model: Professional }
+            ]
         })
-        return sessions.map((session) => session.dataValues)
+        return sessions.map((session) => {
+            session.dataValues.patient = session.dataValues.patient.dataValues
+            session.dataValues.professional = session.dataValues.professional.dataValues
+            return session.dataValues
+        })
     } catch (err) {
         console.log("SQL Error: "+err)
         return false
