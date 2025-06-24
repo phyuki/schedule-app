@@ -1,6 +1,6 @@
 import { Autocomplete, Snackbar, TextField } from "@mui/material";
 import Modal from "./Modal";
-import { DatePicker, TimeField } from "@mui/x-date-pickers";
+import { DatePicker, dateTimePickerTabsClasses, TimeField } from "@mui/x-date-pickers";
 import dayjs from 'dayjs';
 import 'dayjs/locale/pt-br';
 
@@ -12,6 +12,7 @@ export default function ScheduleForm({ setModalVisible, defaultContent, refreshS
     const { register, control, handleSubmit, watch, 
         reset, setError, clearErrors, formState: { errors } } = useForm({
         defaultValues: {
+            id: defaultContent.id ?? null, 
             subject: defaultContent.subject ?? '',
             professional: defaultContent.professional ?? null,
             patient: defaultContent.patient ?? null,
@@ -115,8 +116,40 @@ export default function ScheduleForm({ setModalVisible, defaultContent, refreshS
         return true
     }
 
-    const onSubmit = async (data) => {
+    const validateEqualFields = (data) => {
+        const equalSubject = defaultContent.subject === data.subject
+        const equalProfessional = defaultContent.professional.id === data.professional.id;
+        const equalPatient = defaultContent.patient.id === data.patient.id;
+        const equalDate = dayjs(defaultContent.date, 'YYYY-MM-DD').isSame(data.date, 'day')
+        const equalStart = dayjs(defaultContent.startTime, 'HH:mm:ss').isSame(data.startTime, 'minute')
+        const equalEnd = dayjs(defaultContent.endTime, 'HH:mm:ss').isSame(data.endTime, 'minute')
 
+        return !(equalSubject && equalProfessional && equalPatient && equalDate && equalStart && equalEnd)
+    }
+
+    async function registerSession(result, session, toCreate) {
+        const message = toCreate ? "cadastrada" : "atualizada"
+
+        if(validateSessions(result, session)) {
+            const response = toCreate ? await window.sessionAPI.createSession(session) 
+                : await window.sessionAPI.updateSession(defaultContent.id, session)
+
+            if(response) {
+                setSnackbarMessage(`Consulta ${message} com sucesso!`)
+                refreshSessions(selectedProf)
+            } else {
+                setSnackbarMessage("Não foi possível marcar esta consulta - Tente Novamente!")
+                console.log(response)
+            }
+        } else {
+            const errorMessage = { type: "manual", message: "Horário ocupado" }
+            setError("startTime", errorMessage)
+            setError("endTime", errorMessage)
+            setSnackbarMessage("Este horário não está disponível!")
+        }
+    }
+
+    const onSubmit = async (data) => {
         const formattedDate = data.date.format('YYYY-MM-DD')
         const result = await window.sessionAPI.findSessionsByDate(selectedProf.id, formattedDate)
         
@@ -129,25 +162,15 @@ export default function ScheduleForm({ setModalVisible, defaultContent, refreshS
             professionalId: selectedProf.id
         }
 
-        if(validateSessions(result, session)) {
-            try {
-                const response = await window.sessionAPI.createSession(session)
-                if(response) {
-                    setSnackbarMessage("Consulta marcada com sucesso!")
-                    refreshSessions(selectedProf)
-                } else {
-                    setSnackbarMessage("Não foi possível marcar esta consulta - Tente Novamente!")
-                    console.log(response)
-                }
-            } catch (err) {
-                console.log(err)
-                return
+        if(defaultContent.subject) {
+            if(validateEqualFields(data)) {
+                const filterResult = result.filter(item => item.id !== defaultContent.id)
+                registerSession(filterResult, session, false)
+            } else {
+                setSnackbarMessage("Horário idêntico ao cadastrado!")
             }
         } else {
-            const errorMessage = { type: "manual", message: "Horário ocupado" }
-            setError("startTime", errorMessage)
-            setError("endTime", errorMessage)
-            setSnackbarMessage("Este horário não está disponível!")
+            registerSession(result, session, true)
         }
 
         clearErrors([["startTime", "endTime"]])

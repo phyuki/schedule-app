@@ -1,7 +1,7 @@
 const { contextBridge } = require('electron');
 const { searchClinic, createClinic } = require('./service/clinic-service');
 const { createProfessional, fetchAllProfessionals, searchProfessionals, updateProfessional } = require('./service/professional-service');
-const { findSessionsByProfessional, createSession, findSessionsByDate } = require('./service/session-service');
+const { findSessionsByProfessional, createSession, findSessionsByDate, updateSession } = require('./service/session-service');
 const { searchPatients, createPatient, updatePatient } = require('./service/patient-service');
 
 contextBridge.exposeInMainWorld('clinicAPI', {
@@ -19,7 +19,8 @@ contextBridge.exposeInMainWorld('professionalAPI', {
 contextBridge.exposeInMainWorld('sessionAPI', {
     findSessionsByProfessional: async (professionalId, activeWeek) => await findSessionsByProfessional(professionalId, activeWeek),
     findSessionsByDate: async (professionalId, date) => await findSessionsByDate(professionalId, date),
-    createSession: async (session) => await createSession(session)
+    createSession: async (session) => await createSession(session),
+    updateSession: async (sessionId, session) => await updateSession(sessionId, session)
 })
 
 contextBridge.exposeInMainWorld('patientAPI', {

@@ -13,6 +13,9 @@ async function findSessionsByProfessional( professionalId, activeWeek ) {
 
     try{
         const sessions = await Session.findAll({
+            attributes: {
+                exclude: ['patientId', 'professionalId']
+            },
             where: {
                 professionalId: professionalId,
                 date: {
@@ -39,7 +42,7 @@ async function findSessionsByDate( professionalId, date) {
 
     try {
         const sessions = await Session.findAll({
-            attributes: ['startTime', 'endTime'],
+            attributes: ['id', 'startTime', 'endTime'],
             where: {
                 professionalId: professionalId,
                 date: date
@@ -61,7 +64,24 @@ async function createSession( session ) {
         console.log("SQL Error: "+err)
         return false
     }
-
 }
 
-module.exports = { findSessionsByProfessional, findSessionsByDate, createSession }
+async function updateSession( sessionId, session ) {
+    try {
+        const result = await Session.update(
+            session,
+            { where: { id: sessionId } }
+        )
+        return !!result
+    } catch (err) {
+        console.log("SQL Error: "+err)
+        return false
+    }
+}
+
+module.exports = { 
+    findSessionsByProfessional, 
+    findSessionsByDate, 
+    createSession,
+    updateSession
+}

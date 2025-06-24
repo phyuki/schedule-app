@@ -93,7 +93,6 @@ export default function Schedule () {
 
     const refreshSessions = (professional) => {
         const activeWeek = fetchCalendarWeek()
-        console.log(professional)
         fetchSessions(professional.id, activeWeek)
         setProfessionals([professional])
         setScheduleProf(professional)
