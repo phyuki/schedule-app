@@ -1,4 +1,4 @@
-import { Autocomplete, TextField } from "@mui/material";
+import { Autocomplete, Pagination, TextField } from "@mui/material";
 import { useEffect, useState } from "react";
 import ProgressForm from "./ProgressForm";
 import ProgressItem from "./ProgressItem";
@@ -28,9 +28,9 @@ export default function Progress() {
     async function fetchProgress(patientId, page, size) {
         const history = await window.progressAPI.findProgressByPatient(patientId, page, size)
         setHistory(history?.rows)
-        setSorting((page) => { 
-            if(page.totalPages === history.totalPages) return page
-            return { ...page, totalPages: history.totalPages }
+        setSorting((sort) => { 
+            if(sort.totalPages === history.totalPages) return sort
+            return { ...sort, totalPages: history.totalPages }
         })
     }
 
@@ -60,8 +60,9 @@ export default function Progress() {
         setSelected(selectedOption)
         setLoading(false)
         if(selectedOption) {
-            fetchProgress(selectedOption.id, sorting.page, sorting.size)
+            setSorting((sort) => ({ ...sort, page: 1 }))
         } else {
+            setSorting({page: 1, size: 2, totalPages: 0})
             setHistory([])
         }
     }
@@ -71,7 +72,7 @@ export default function Progress() {
     }
 
     const refreshProgress = (patient) => {
-        fetchProgress(patient.id, 1, 5)
+        setSorting((sort) => ({ ...sort, page: 1 }))
         setPatients([patient])
         setSelected(patient)
         setSearchInput(patient.name)
@@ -101,8 +102,9 @@ export default function Progress() {
         })
     }
 
-    function handlePageChange(newPage) {
-        setSorting((page) => ({ ...page, page: newPage }))
+    function handlePageChange(event, value) {
+        if(sorting.page !== value)
+            setSorting((sort) => ({ ...sort, page: value }))
     }
 
     return (
@@ -133,18 +135,16 @@ export default function Progress() {
             <div>
                 {renderPatientHistory()}
             </div>
-            <div>
-                <button 
-                    className="button" 
-                    disabled={sorting.page === 1}
-                    onClick={() => handlePageChange(sorting.page - 1)}
-                >{'<'}</button>
-                <button 
-                    className="button" 
-                    disabled={sorting.page === sorting.totalPages}
-                    onClick={() => handlePageChange(sorting.page + 1)}
-                >{'>'}</button>
-            </div>
+            {sorting.totalPages > 0 &&
+                <nav aria-label="Pagination">
+                    <Pagination 
+                        count={sorting.totalPages} 
+                        shape="rounded" 
+                        page={sorting.page}
+                        onChange={handlePageChange}
+                    />
+                </nav>
+            }
         </div>
     )
 }
