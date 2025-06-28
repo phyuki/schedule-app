@@ -1,6 +1,6 @@
 import { Autocomplete, Snackbar, TextField } from "@mui/material";
 import Modal from "./Modal";
-import { DatePicker, dateTimePickerTabsClasses, TimeField } from "@mui/x-date-pickers";
+import { DatePicker, TimeField } from "@mui/x-date-pickers";
 import dayjs from 'dayjs';
 import 'dayjs/locale/pt-br';
 
@@ -23,7 +23,6 @@ export default function ScheduleForm({ setModalVisible, defaultContent, refreshS
     })
 
     const startTime = watch('startTime')
-    const selectedProf = watch('professional')
 
     const [professionals, setProfessionals] = useState([defaultContent.professional])
     const [patients, setPatients] = useState([defaultContent.patient])
@@ -127,7 +126,7 @@ export default function ScheduleForm({ setModalVisible, defaultContent, refreshS
         return !(equalSubject && equalProfessional && equalPatient && equalDate && equalStart && equalEnd)
     }
 
-    async function registerSession(result, session, toCreate) {
+    async function registerSession(result, session, professional, toCreate) {
         const message = toCreate ? "cadastrada" : "atualizada"
 
         if(validateSessions(result, session)) {
@@ -136,7 +135,7 @@ export default function ScheduleForm({ setModalVisible, defaultContent, refreshS
 
             if(response) {
                 setSnackbarMessage(`Consulta ${message} com sucesso!`)
-                refreshSessions(selectedProf)
+                refreshSessions(professional)
             } else {
                 setSnackbarMessage("Não foi possível marcar esta consulta - Tente Novamente!")
                 console.log(response)
@@ -150,8 +149,9 @@ export default function ScheduleForm({ setModalVisible, defaultContent, refreshS
     }
 
     const onSubmit = async (data) => {
+        const professional = data.professional
         const formattedDate = data.date.format('YYYY-MM-DD')
-        const result = await window.sessionAPI.findSessionsByDate(selectedProf.id, formattedDate)
+        const result = await window.sessionAPI.findSessionsByDate(professional.id, formattedDate)
         
         const session = {
             subject: data.subject,
@@ -159,18 +159,18 @@ export default function ScheduleForm({ setModalVisible, defaultContent, refreshS
             startTime: startTime.format('HH:mm:ss'),
             endTime: data.endTime.format('HH:mm:ss'),
             patientId: data.patient.id,
-            professionalId: selectedProf.id
+            professionalId: professional.id
         }
 
         if(defaultContent.subject) {
             if(validateEqualFields(data)) {
                 const filterResult = result.filter(item => item.id !== defaultContent.id)
-                registerSession(filterResult, session, false)
+                registerSession(filterResult, session, professional, false)
             } else {
                 setSnackbarMessage("Horário idêntico ao cadastrado!")
             }
         } else {
-            registerSession(result, session, true)
+            registerSession(result, session, professional, true)
         }
 
         clearErrors([["startTime", "endTime"]])
@@ -219,7 +219,7 @@ export default function ScheduleForm({ setModalVisible, defaultContent, refreshS
                             onInputChange={(event, input) => setInputSelectedProf(input)}
                             onChange={(_, value) => {
                                 field.onChange(value)
-                                setLoadingPatient(false)
+                                setLoadingProf(false)
                             }}
                             loading={loadingProf}
                             loadingText='Pesquisando...'

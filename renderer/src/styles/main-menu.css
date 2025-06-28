@@ -69,3 +69,10 @@ html, body {
     cursor:default;
     background-color: grey;
 }
+
+.progress-item {
+    background-color: white;
+    border-radius: 5px;
+    margin: 10px;
+    padding: 5px;
+}   

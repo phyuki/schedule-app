@@ -10,6 +10,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import RegistrationProf from "@/components/RegistrationProf";
 import RegistrationPatient from "@/components/RegistrationPatient"
+import Progress from "@/components/Progress"
 
 export default function Page () {
 
@@ -24,7 +25,7 @@ export default function Page () {
             case 'patients':
                 return <RegistrationPatient />
             default:
-                return <p>{content}</p>
+                return <Progress />
         }
     }
 
