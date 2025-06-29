@@ -41,6 +41,7 @@ export default function ProgressForm({ setModalVisible, defaultContent, refreshP
     const changeInput = (input, setLoading, callbackOptions, callbackFetch) => {
         if(!input) {
             callbackOptions([])
+            setLoading(false)
             return
         } else {
             setLoading(true)

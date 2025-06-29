@@ -21,10 +21,6 @@ export default function Progress() {
         totalPages: 0
     })
 
-    async function fetchPatients(search) {
-        return window.patientAPI.searchPatients(search)
-    }
-
     async function fetchProgress(patientId, page, size) {
         const history = await window.progressAPI.findProgressByPatient(patientId, page, size)
         setHistory(history?.rows)
@@ -34,21 +30,22 @@ export default function Progress() {
         })
     }
 
-    async function updateOptions() {
-        const result = await fetchPatients(searchInput)
+    async function updateOptions(search) {
+        const result = await window.patientAPI.searchPatients(search)
         setPatients(result)
-        if(result.length === 0) setLoading(false)
+        setLoading(false)
     }
 
     useEffect(() => {
         if(!searchInput) {
             setPatients([])
+            setLoading(false)
             return
         } else {
             setLoading(true)
         } 
 
-        updateOptions()
+        updateOptions(searchInput)
     }, [searchInput]) 
 
     useEffect(() => {

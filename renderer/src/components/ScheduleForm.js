@@ -50,6 +50,7 @@ export default function ScheduleForm({ setModalVisible, defaultContent, refreshS
     const changeInput = (input, setLoading, callbackOptions, callbackFetch) => {
         if(!input) {
             callbackOptions([])
+            setLoading(false)
             return
         } else {
             setLoading(true)

@@ -19,12 +19,13 @@ export default function RegistrationForm ({
     async function updateOptions() {
         const result = await fetchOptions(searchInput)
         setOptions(result)
-        if(result.length === 0) setLoading(false)
+        setLoading(false)
     }
 
     useEffect(() => {
         if(!searchInput) {
             setOptions([])
+            setLoading(false)
             return
         } else {
             setLoading(true)

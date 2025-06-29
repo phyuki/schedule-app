@@ -23,12 +23,13 @@ export default function Schedule () {
     async function fetchProfessionals(search) {
         const result = await window.professionalAPI.searchProfessionals(search)
         setProfessionals(result)
-        if(result.length === 0) setLoading(false)
+        setLoading(false)
     }
 
     const changeInput = (input, callbackOptions, callbackFetch) => {
         if(!input) {
             callbackOptions([])
+            setLoading(false)
             return
         } else {
             setLoading(true)
