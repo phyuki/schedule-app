@@ -29,19 +29,20 @@ export default function Page () {
         }
     }
 
+    const formatClassName = (section) => {
+        return `main-menu-item ${content === section && 'bg-light-white text-menu'}`
+    }
+
     return (
         <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="pt-br">
-            <div className="page-wrapper column-flex">
-                <div className="row-flex" id="horizontal-menu">
-                    <button onClick={() => setContent('profile')}>
-                        <Image className="item-menu" src="/assets/img_icon.png" alt="Logo da Clínica" width={120} height={100}/>
-                    </button>
-                    <button className="item-menu" onClick={() => setContent('schedule')}>Agenda</button>
-                    <button className="item-menu" onClick={() => setContent('professionals')}>Profissionais</button>
-                    <button className="item-menu" onClick={() => setContent('patients')}>Pacientes</button>
-                    <button className="item-menu" onClick={() => setContent('progress')}>Evolução</button>
+            <div className="flex flex-col">
+                <div className="flex flex-row h-20 bg-menu text-light-white justify-evenly border-b-2 border-light-white">
+                    <button className={formatClassName('schedule')} onClick={() => setContent('schedule')}>Agenda</button>
+                    <button className={formatClassName('professionals')} onClick={() => setContent('professionals')}>Profissionais</button>
+                    <button className={formatClassName('patients')} onClick={() => setContent('patients')}>Pacientes</button>
+                    <button className={formatClassName('progress')} onClick={() => setContent('progress')}>Evolução</button>
                 </div>
-                <div className="column-flex" id="content">
+                <div className="flex flex-col flex-auto" id="content">
                     {showContent()}
                 </div>
             </div>

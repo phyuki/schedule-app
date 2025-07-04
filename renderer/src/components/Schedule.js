@@ -130,55 +130,78 @@ export default function Schedule () {
                     refreshSessions={refreshSessions}
                 /> 
             }
-            <div className="row-flex center header-content">
+            <div className="flex flex-row items-center my-4 justify-center">
                 <Autocomplete 
-                        disablePortal
-                        value={scheduleProf}
-                        inputValue={inputScheduleProf}
-                        options={professionals}
-                        getOptionLabel={(option) => option ? option.name : option}
-                        onInputChange={(event, input) => setInputScheduleProf(input)}
-                        onChange={handleChangeScheduleProf}
-                        loading={loading}
-                        loadingText='Pesquisando...'
-                        sx={{width: 300}}
-                        noOptionsText='Nenhum professional encontrado'
-                        renderInput={(params) => <TextField {...params} label="Profissional" />}
+                    className="w-[20%] mx-4"
+                    disablePortal
+                    value={scheduleProf}
+                    inputValue={inputScheduleProf}
+                    options={professionals}
+                    getOptionLabel={(option) => option ? option.name : option}
+                    onInputChange={(event, input) => setInputScheduleProf(input)}
+                    onChange={handleChangeScheduleProf}
+                    loading={loading}
+                    loadingText='Pesquisando...'
+                    noOptionsText='Nenhum professional encontrado'
+                    renderInput={(params) => <TextField {...params} label="Profissional" className="custom-autocomplete-input" />}
+                    renderOption={(props, option) => {
+                        const {key, ...otherProps} = props
+                        return (
+                        <li 
+                            key={key}
+                            {...otherProps} 
+                            className="hover:bg-gray-200 px-5 py-2 cursor-pointer"
+                        >
+                            {option.name}
+                        </li>
+                        )
+                    }}
                 />
                 <button 
-                    className="button" 
+                    className="button-submit mx-4" 
                     onClick={() => {
                         setSelectedSession({ professional: scheduleProf })
                         setModalVisible(true)
                     }}
-                >Marcar Apontamento</button>
+                >Marcar Consulta</button>
             </div>
-            <FullCalendar
-                plugins={[timeGridPlugin]}
-                locale={'pt-br'}
-                initialView="timeGridWeek"
-                contentHeight="auto"
-                hiddenDays={[ 0 ]}
-                slotMinTime={'06:00:00'}
-                slotMaxTime={'19:00:00'}
-                slotLabelInterval={'01:00:00'}
-                allDaySlot={false}
-                dayHeaderContent={showDayHeaderContent}
-                headerToolbar={{
-                    left: '',
-                    center: '',
-                    right: 'today prev,next'
-                }}
-                slotLabelFormat={{
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    hour12: false 
-                }}
-                ref={calendarRef}
-                datesSet={handleDatesSet}
-                events={events}
-                eventClick={handleCalendarEventClick}
-            />
+            <div className="mx-4 mb-4 pt-4 bg-gray-100 border-2 border-black">
+                <FullCalendar
+                    plugins={[timeGridPlugin]}
+                    locale={'pt-br'}
+                    initialView="timeGridWeek"
+                    contentHeight="auto"
+                    hiddenDays={[ 0 ]}
+                    slotMinTime={'06:00:00'}
+                    slotMaxTime={'19:00:00'}
+                    slotLabelInterval={'01:00:00'}
+                    allDaySlot={false}
+                    dayHeaderContent={showDayHeaderContent}
+                    headerToolbar={{
+                        left: '',
+                        center: '',
+                        right: 'today prev,next'
+                    }}
+                    customButtons={{
+                        today: {
+                            text: 'Hoje',
+                            click: () => { 
+                                const calendarApi = calendarRef.current.getApi()
+                                calendarApi.today()
+                            }
+                        }
+                    }}
+                    slotLabelFormat={{
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        hour12: false 
+                    }}
+                    ref={calendarRef}
+                    datesSet={handleDatesSet}
+                    events={events}
+                    eventClick={handleCalendarEventClick}
+                />
+            </div>
         </div>
     )
 }

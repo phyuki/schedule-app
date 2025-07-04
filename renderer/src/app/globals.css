@@ -3,6 +3,18 @@
 :root {
   --background: #B2D9C4;
   --foreground: #171717;
+  --fc-page-bg-color: #171717;
+  --fc-border-color: #000;
+  --fc-event-bg-color: #247D7F;
+  --fc-event-border-color: #247D7F;
+}
+
+@theme {
+  --color-background: #B2D9C4; 
+  --color-button: #247D7F;
+  --color-hover-button: #207172;
+  --color-menu: #247D7F;
+  --color-light-white: #F7FCFE;
 }
 
 @theme inline {
@@ -25,10 +37,86 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+.button-submit {
+  @apply cursor-pointer;
+  @apply bg-button hover:bg-hover-button text-base text-white;
+  @apply p-3 rounded-[80px] my-5;
+}
+
+.form-item {
+  @apply bg-gray-200;
+}
+
+.main-menu-item {
+  @apply w-32 cursor-pointer;
+  @apply hover:bg-light-white hover:text-menu;
+}
+
+.custom-autocomplete-input .MuiOutlinedInput-root {
+  @apply bg-light-white;
+}
+
+.custom-autocomplete-input .MuiOutlinedInput-root fieldset {
+  border: 2px solid #4b5563;
+}
+
+.custom-autocomplete-input .MuiOutlinedInput-root:hover fieldset {
+  border-color: #1f2937;
+}
+
+.custom-autocomplete-input .MuiOutlinedInput-root.Mui-focused fieldset {
+  @apply border-button;
+}
+
+.custom-autocomplete-input .MuiInputLabel-root.MuiInputLabel-shrink {
+  color: #4b5563;
+  font-size: 1rem;
+}
+
+.custom-autocomplete-input .MuiInputLabel-root.MuiInputLabel-shrink.Mui-focused {
+  @apply text-button;
+}
+
+.fc .fc-button,
+.fc .fc-button-primary {
+  @apply bg-button border-none mx-1 rounded-sm;
+}
+
+.fc .fc-button:hover {
+  @apply bg-hover-button;
+}
+
+.fc .fc-button:disabled {
+  @apply bg-button;
+}
+
+@layer components {
+  .fc .fc-col-header-cell {
+    @apply bg-button text-light-white font-semibold;
+  }
+
+  .fc .fc-timegrid-slot-label {
+    @apply bg-button text-light-white font-semibold;
+  }
+
+  .fc .fc-day-today {
+    @apply bg-hover-button;
+  }
+
+  .fc .fc-timegrid-col.fc-day-today,
+  .fc .fc-timegrid-col.fc-day-today .fc-timegrid-col-frame {
+    @apply bg-background;
+  }
+}
+
 .fc .fc-timegrid-slot {
-  height: 30px; 
+  height: 30px;
 }
 
 .fc .fc-timegrid-slot-minor {
   border-top: none;
+}
+
+.fc-direction-ltr .fc-timegrid-col-events {
+  margin: 0px !important;
 }
