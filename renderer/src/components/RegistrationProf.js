@@ -1,8 +1,10 @@
-import { TextField } from "@mui/material";
+import { Grid, TextField } from "@mui/material";
 
 import RegistrationForm from "./RegistrationForm";
 import PhoneInput from "./PhoneInput";
 import { Controller, useForm } from "react-hook-form";
+import { DatePicker } from "@mui/x-date-pickers";
+import dayjs from "dayjs";
 
 export default function RegistrationProf() {
     
@@ -10,7 +12,9 @@ export default function RegistrationProf() {
         defaultValues: {
             name: '',
             address: '',
-            phone: ''
+            phone: '',
+            cpf: '',
+            birthDate: null
         }
     })
 
@@ -50,11 +54,19 @@ export default function RegistrationProf() {
         else return undefined
     }
 
+    const validateDateField = (date) => {
+        if(!date) return 'Campo obrigatório'
+        if(!dayjs(date).isValid() || date.isAfter(dayjs(), 'day')) return 'Data inválida'
+        else return true
+    }
+
     function changeFormItems(professional) {
         if(professional) {
             setValue('name', professional.name, { shouldValidate: true })
             setValue('address', professional.address, { shouldValidate: true })
             setValue('phone', professional.phone, { shouldValidate: true })
+            setValue('cpf', professional.cpf, { shouldValidate: true })
+            setValue('birthDate', professional.birthDate.format('YYYY-MM-DD'), { shouldValidate: true })
         } else {
             reset()
         }
@@ -70,44 +82,94 @@ export default function RegistrationProf() {
             handleSubmit={handleSubmit}
             changeFormItems={changeFormItems}
         >
-            <Controller
-                name="name"
-                control={control}
-                rules={{ validate: (value) => validateIsEmpty(value) }}
-                render={({ field, fieldState }) => 
-                    <TextField 
-                        {...field}
-                        label="Nome completo"
-                        error={!!fieldState.error}
-                        helperText={fieldState.error?.message}
-                    />
-                }
-            />
-           <Controller
-                name="address"
-                control={control}
-                rules={{ validate: (value) => validateIsEmpty(value) }}
-                render={({ field, fieldState }) => 
-                    <TextField 
-                        {...field}
-                        label="Endereço"
-                        error={!!fieldState.error}
-                        helperText={fieldState.error?.message}
-                    />
-                }
-            />
-            <Controller
-                name="phone"
-                control={control}
-                rules={{ validate: (value) => validatePhoneNumber(value) }}
-                render={({ field, fieldState }) => 
-                    <PhoneInput 
-                        value={field.value}
-                        onChange={field.onChange}
-                        helperText={fieldState.error}
-                    />
-                }
-            />
+            <Grid item size={12}>
+                <Controller
+                    name="name"
+                    control={control}
+                    rules={{ validate: (value) => validateIsEmpty(value) }}
+                    render={({ field, fieldState }) => 
+                        <TextField 
+                            {...field}
+                            label="Nome completo"
+                            error={!!fieldState.error}
+                            helperText={fieldState.error?.message}
+                            fullWidth
+                            className="custom-textfield-input"
+                        />
+                    }
+                />
+            </Grid>
+            <Grid item size={12}>
+                <Controller
+                    name="address"
+                    control={control}
+                    rules={{ validate: (value) => validateIsEmpty(value) }}
+                    render={({ field, fieldState }) => 
+                        <TextField 
+                            {...field}
+                            label="Endereço"
+                            error={!!fieldState.error}
+                            helperText={fieldState.error?.message}
+                            fullWidth
+                            className="custom-textfield-input"
+                        />
+                    }
+                />
+            </Grid>
+            <Grid item size={6}>
+                <Controller
+                    name="cpf"
+                    control={control}
+                    rules={{ validate: (value) => validateIsEmpty(value) }}
+                    render={({ field, fieldState }) => 
+                        <TextField 
+                            {...field}
+                            label="CPF"
+                            error={!!fieldState.error}
+                            helperText={fieldState.error?.message}
+                            fullWidth
+                            className="custom-textfield-input"
+                        />
+                    }
+                />
+            </Grid>
+            <Grid item size={6}>
+                <Controller
+                    name="birthDate"
+                    control={control}
+                    rules={{ validate: (value) => validateDateField(value) }}
+                    render={({ field }) => (
+                        <DatePicker 
+                            label='Data de nascimento'
+                            {...field}
+                            format="DD/MM/YYYY"
+                            slotProps={{
+                                textField: {
+                                    fullWidth: true, 
+                                    className: 'custom-textfield-input', 
+                                    error: !!errors.birthDate,
+                                    helperText: errors.birthDate?.message
+                                }
+                            }}
+                        />
+                    )} 
+                />
+            </Grid>
+            <Grid item size={6}>
+                <Controller
+                    name="phone"
+                    control={control}
+                    rules={{ validate: (value) => validatePhoneNumber(value) }}
+                    render={({ field, fieldState }) => 
+                        <PhoneInput 
+                            value={field.value}
+                            onChange={field.onChange}
+                            helperText={fieldState.error}
+                            className="custom-textfield-input"
+                        />
+                    }
+                />
+            </Grid>
         </RegistrationForm>
     )
 }

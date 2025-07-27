@@ -2,6 +2,7 @@ import { Autocomplete, Pagination, TextField } from "@mui/material";
 import { useEffect, useState } from "react";
 import ProgressForm from "./ProgressForm";
 import ProgressItem from "./ProgressItem";
+import { FilePdf, ListPlus, NotePencil } from "phosphor-react";
 
 export default function Progress() {
 
@@ -113,8 +114,9 @@ export default function Progress() {
                     refreshProgress={refreshProgress}
                 /> 
             }
-            <div>
+            <div className="flex flex-row items-center justify-center my-4">
                 <Autocomplete 
+                    className="w-[18%] min-w-2xs ml-8 mx-4"
                     disablePortal
                     value={selected}
                     options={patients}
@@ -122,12 +124,15 @@ export default function Progress() {
                     onInputChange={(event, input) => setSearchInput(input)}
                     onChange={handleChange}
                     loading={loading}
-                    sx={{width: 300}}
                     noOptionsText={"Nenhum paciente encontrado"}
-                    renderInput={(params) => <TextField {...params} label={"Pacientes"} />}
+                    renderInput={(params) => <TextField {...params} className="custom-textfield-input" label={"Pacientes"} />}
                 />
-                <button className="button" onClick={() => setModalVisible(true)}>+</button>
-                <button className="button" onClick={downloadProgress}>PDF</button>
+                <button className="button-submit button-register" onClick={() => setModalVisible(true)}>
+                    <NotePencil size={32} />
+                </button>
+                <button className="button-submit button-register" onClick={downloadProgress}>
+                    <FilePdf size={32} />
+                </button>
             </div>
             <div>
                 {renderPatientHistory()}

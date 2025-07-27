@@ -18,7 +18,7 @@ const TextMaskCustom = React.forwardRef(function TextMaskCustom(props, ref) {
   )
 })
 
-export default function PhoneInput({ value, onChange, helperText }) {
+export default function PhoneInput({ value, onChange, helperText, className }) {
 
     return (
         <TextField 
@@ -27,6 +27,8 @@ export default function PhoneInput({ value, onChange, helperText }) {
             onChange={onChange}
             error={!!helperText}
             helperText={helperText?.message}
+            fullWidth
+            className={className}
             slotProps={{
                 input: {
                     inputComponent: TextMaskCustom

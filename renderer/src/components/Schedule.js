@@ -1,8 +1,9 @@
 import FullCalendar from "@fullcalendar/react";
 import timeGridPlugin from '@fullcalendar/timegrid';
 import { useEffect, useRef, useState } from "react";
-import { Autocomplete, TextField } from "@mui/material";
+import { Autocomplete, Card, CardContent, TextField } from "@mui/material";
 import ScheduleForm from "./ScheduleForm";
+import { CalendarPlus } from "phosphor-react";
 
 export default function Schedule () {
 
@@ -130,9 +131,9 @@ export default function Schedule () {
                     refreshSessions={refreshSessions}
                 /> 
             }
-            <div className="flex flex-row items-center my-4 justify-center">
+            <div className="flex flex-row items-center justify-center my-4">
                 <Autocomplete 
-                    className="w-[20%] mx-4"
+                    className="w-[18%] min-w-2xs mx-4"
                     disablePortal
                     value={scheduleProf}
                     inputValue={inputScheduleProf}
@@ -143,7 +144,7 @@ export default function Schedule () {
                     loading={loading}
                     loadingText='Pesquisando...'
                     noOptionsText='Nenhum professional encontrado'
-                    renderInput={(params) => <TextField {...params} label="Profissional" className="custom-autocomplete-input" />}
+                    renderInput={(params) => <TextField {...params} label="Profissional" className="custom-textfield-input" />}
                     renderOption={(props, option) => {
                         const {key, ...otherProps} = props
                         return (
@@ -158,50 +159,57 @@ export default function Schedule () {
                     }}
                 />
                 <button 
-                    className="button-submit mx-4" 
+                    className="button-submit  button-register" 
                     onClick={() => {
                         setSelectedSession({ professional: scheduleProf })
                         setModalVisible(true)
                     }}
-                >Marcar Consulta</button>
+                >
+                    <CalendarPlus size={32} />
+                </button>
             </div>
-            <div className="mx-4 mb-4 pt-4 bg-gray-100 border-2 border-black">
-                <FullCalendar
-                    plugins={[timeGridPlugin]}
-                    locale={'pt-br'}
-                    initialView="timeGridWeek"
-                    contentHeight="auto"
-                    hiddenDays={[ 0 ]}
-                    slotMinTime={'06:00:00'}
-                    slotMaxTime={'19:00:00'}
-                    slotLabelInterval={'01:00:00'}
-                    allDaySlot={false}
-                    dayHeaderContent={showDayHeaderContent}
-                    headerToolbar={{
-                        left: '',
-                        center: '',
-                        right: 'today prev,next'
-                    }}
-                    customButtons={{
-                        today: {
-                            text: 'Hoje',
-                            click: () => { 
-                                const calendarApi = calendarRef.current.getApi()
-                                calendarApi.today()
+            <Card
+                sx={{mx: 2, mb: 2, pt: 2, bgcolor: 'gray.100',}}
+                elevation={24}
+            >
+                <CardContent>
+                    <FullCalendar
+                        plugins={[timeGridPlugin]}
+                        locale={'pt-br'}
+                        initialView="timeGridWeek"
+                        contentHeight="auto"
+                        hiddenDays={[ 0 ]}
+                        slotMinTime={'06:00:00'}
+                        slotMaxTime={'19:00:00'}
+                        slotLabelInterval={'01:00:00'}
+                        allDaySlot={false}
+                        dayHeaderContent={showDayHeaderContent}
+                        headerToolbar={{
+                            left: '',
+                            center: '',
+                            right: 'today prev,next'
+                        }}
+                        customButtons={{
+                            today: {
+                                text: 'Hoje',
+                                click: () => { 
+                                    const calendarApi = calendarRef.current.getApi()
+                                    calendarApi.today()
+                                }
                             }
-                        }
-                    }}
-                    slotLabelFormat={{
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        hour12: false 
-                    }}
-                    ref={calendarRef}
-                    datesSet={handleDatesSet}
-                    events={events}
-                    eventClick={handleCalendarEventClick}
-                />
-            </div>
+                        }}
+                        slotLabelFormat={{
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            hour12: false 
+                        }}
+                        ref={calendarRef}
+                        datesSet={handleDatesSet}
+                        events={events}
+                        eventClick={handleCalendarEventClick}
+                    />
+                </CardContent>
+            </Card>
         </div>
     )
 }

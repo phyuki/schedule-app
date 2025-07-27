@@ -24,21 +24,11 @@ html, body {
     width: 100%;
 }
 
-.header-content {
-    margin: 25px 50px;
-    justify-content: space-evenly;
-}
-
 #horizontal-menu {
     height: 120px;
     background-color: lightcyan;
     justify-content: space-evenly;
     border: 1px solid violet;
-}
-
-#content {
-    flex: 1;
-    border: 1px solid blue;
 }
 
 .item-menu {
@@ -52,7 +42,7 @@ html, body {
 }
 
 .button {
-    padding: 15px;
+    padding: 10px;
     border: none;
     border-radius: 80px;
     background-color: #247D7F;

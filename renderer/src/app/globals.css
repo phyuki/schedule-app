@@ -40,7 +40,11 @@ body {
 .button-submit {
   @apply cursor-pointer;
   @apply bg-button hover:bg-hover-button text-base text-white;
-  @apply p-3 rounded-[80px] my-5;
+  @apply p-3;
+}
+
+.button-register {
+  @apply rounded-[20px] my-5  mx-4;
 }
 
 .form-item {
@@ -52,30 +56,32 @@ body {
   @apply hover:bg-light-white hover:text-menu;
 }
 
-.custom-autocomplete-input .MuiOutlinedInput-root {
+.custom-textfield-input {
   @apply bg-light-white;
+  width: 100%;
 }
 
-.custom-autocomplete-input .MuiOutlinedInput-root fieldset {
+.custom-textfield-input fieldset {
   border: 2px solid #4b5563;
 }
 
-.custom-autocomplete-input .MuiOutlinedInput-root:hover fieldset {
+.custom-textfield-input:hover fieldset {
   border-color: #1f2937;
 }
 
-.custom-autocomplete-input .MuiOutlinedInput-root.Mui-focused fieldset {
+.custom-textfield-input .MuiOutlinedInput-root.Mui-focused fieldset {
   @apply border-button;
 }
 
-.custom-autocomplete-input .MuiInputLabel-root.MuiInputLabel-shrink {
+.custom-textfield-input .MuiInputLabel-root.MuiInputLabel-shrink {
   color: #4b5563;
   font-size: 1rem;
 }
 
-.custom-autocomplete-input .MuiInputLabel-root.MuiInputLabel-shrink.Mui-focused {
+.custom-textfield-input .MuiInputLabel-root.MuiInputLabel-shrink.Mui-focused {
   @apply text-button;
 }
+
 
 .fc .fc-button,
 .fc .fc-button-primary {

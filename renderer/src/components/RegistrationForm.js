@@ -1,4 +1,5 @@
-import { Autocomplete, Snackbar, TextField } from "@mui/material"
+import { Autocomplete, Card, CardContent, Grid, Snackbar, TextField } from "@mui/material"
+import { UserCirclePlus, UserPlus } from "phosphor-react"
 import { useEffect, useState } from "react"
 
 export default function RegistrationForm ({ 
@@ -86,15 +87,16 @@ export default function RegistrationForm ({
     }
 
     return (
-        <div>
+        <div className="flex flex-col flex-1 relative">
             <Snackbar 
                 open={snackbarOpen}
                 autoHideDuration={3000}
                 onClose={() => setSnackbarOpen(false)}
                 message={snackbarMessage}
             />
-            <div className="row-flex center">
+            <div className="flex flex-row items-center justify-center my-4">
                 <Autocomplete 
+                    className="w-[18%] min-w-2xs mx-4"
                     disablePortal
                     value={selected}
                     options={options}
@@ -102,17 +104,32 @@ export default function RegistrationForm ({
                     onInputChange={(event, input) => setSearchInput(input)}
                     onChange={handleChange}
                     loading={loading}
-                    sx={{width: 300}}
                     noOptionsText={noOptionsText}
-                    renderInput={(params) => <TextField {...params} label={searchLabel} />}
+                    renderInput={(params) => <TextField {...params} className="custom-textfield-input" label={searchLabel} />}
                 />
-                <button className="button" onClick={switchToRegister}>+</button>
+                <button className="button-submit button-register" onClick={switchToRegister}>
+                    <UserCirclePlus size={32} />
+                </button>
             </div>
-            <form className="column-flex center" onSubmit={handleSubmit(onSubmit, onError)}>
-                {children}
-                <input type="submit" className="button" 
-                       value={isRegister ? "Cadastrar" : "Atualizar"} />
-            </form>
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+                <Card
+                    sx={{mx: 'auto', px: 2, py: 5, bgcolor: 'gray.100', maxWidth: '700px'}}
+                    elevation={24}
+                >
+                    <CardContent sx={{mx: 5, pb: '1rem !important'}}>
+                        <form onSubmit={handleSubmit(onSubmit, onError)}>
+                            <Grid container spacing={4.5}>
+                                {children}
+                                <Grid item size={6} 
+                                sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'flex-end' }}>
+                                    <input type="submit" className="button-submit rounded-[10px]"
+                                    value={isRegister ? "Cadastrar" : "Atualizar"} />
+                                </Grid>
+                            </Grid>
+                        </form>
+                    </CardContent>
+                </Card>
+            </div>
         </div>
     )
 

@@ -35,8 +35,8 @@ export default function Page () {
 
     return (
         <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="pt-br">
-            <div className="flex flex-col">
-                <div className="flex flex-row h-20 bg-menu text-light-white justify-evenly border-b-2 border-light-white">
+            <div className="flex flex-col h-screen">
+                <div className="flex flex-row flex-shrink-0 h-20 bg-menu text-light-white justify-evenly border-b-2 border-light-white">
                     <button className={formatClassName('schedule')} onClick={() => setContent('schedule')}>Agenda</button>
                     <button className={formatClassName('professionals')} onClick={() => setContent('professionals')}>Profissionais</button>
                     <button className={formatClassName('patients')} onClick={() => setContent('patients')}>Pacientes</button>
