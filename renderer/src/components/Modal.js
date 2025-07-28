@@ -1,10 +1,13 @@
+import { XCircle } from "phosphor-react"
 
 export default function Modal ({callback, children}) {
 
     return (
         <div style={styles.overlay}>
-            <div style={styles.modal}>
-                <button style={styles.button} onClick={callback}>X</button>
+            <div className="modal w-[75%]">
+                <button className="close-modal" onClick={callback}>
+                    <XCircle size={38} />
+                </button>
                 {children}
             </div>
         </div>
@@ -19,23 +22,6 @@ const styles = {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        zIndex: 1000
+        zIndex: 1000,
     },
-    modal: {
-        background: 'white',
-        padding: '2rem',
-        minWidth: '300px',
-        position: 'relative',
-        borderRadius: '5px'
-    },
-    button: {
-        position: 'absolute',
-        top: '-15px',
-        right: '-15px',
-        background: '#247D7F',
-        width: '30px',
-        height: '30px',
-        borderRadius: '100%',        
-        cursor: 'pointer'
-    }       
 }

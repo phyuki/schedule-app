@@ -1,4 +1,4 @@
-import { Autocomplete, Snackbar, TextField } from "@mui/material";
+import { Autocomplete, Grid, Snackbar, TextField } from "@mui/material";
 import Modal from "./Modal";
 import { DatePicker, TimeField } from "@mui/x-date-pickers";
 import dayjs from 'dayjs';
@@ -200,121 +200,147 @@ export default function ScheduleForm({ setModalVisible, defaultContent, refreshS
                 message={snackbarMessage}
             />
             <form onSubmit={handleSubmit(onSubmit, onError)}>
-                <TextField 
-                    label="Motivo da consulta"
-                    {...register("subject", { validate: (value) => validateIsEmpty(value, true) })}
-                    error={!!errors.subject}
-                    helperText={errors.subject?.message}
-                />
-                <Controller
-                    name="professional"
-                    control={control}
-                    rules={{ validate: (value) => validateIsEmpty(value, false) }}
-                    render={({ field }) => (
-                        <Autocomplete 
-                            {...field}
-                            disablePortal
-                            value={field.value}
-                            options={professionals}
-                            getOptionLabel={(option) => option ? option.name : option}
-                            onInputChange={(event, input) => setInputSelectedProf(input)}
-                            onChange={(_, value) => {
-                                field.onChange(value)
-                                setLoadingProf(false)
-                            }}
-                            loading={loadingProf}
-                            loadingText='Pesquisando...'
-                            sx={{width: 300}}
-                            noOptionsText='Nenhum professional encontrado'
-                            renderInput={(params) => 
-                                <TextField {...params} 
-                                    label="Profissional" 
-                                    error={!!errors.professional}
-                                    helperText={errors.professional?.message}
+                <Grid container spacing={4.5}>
+                    <Grid item size={12}>
+                        <TextField 
+                            label="Motivo da consulta"
+                            {...register("subject", { validate: (value) => validateIsEmpty(value, true) })}
+                            error={!!errors.subject}
+                            helperText={errors.subject?.message}
+                            fullWidth
+                            className="custom-textfield-input"
+                        />
+                    </Grid>
+                    <Grid item size={6}>
+                        <Controller
+                            name="professional"
+                            control={control}
+                            rules={{ validate: (value) => validateIsEmpty(value, false) }}
+                            render={({ field }) => (
+                                <Autocomplete 
+                                    {...field}
+                                    disablePortal
+                                    value={field.value}
+                                    options={professionals}
+                                    getOptionLabel={(option) => option ? option.name : option}
+                                    onInputChange={(event, input) => setInputSelectedProf(input)}
+                                    onChange={(_, value) => {
+                                        field.onChange(value)
+                                        setLoadingProf(false)
+                                    }}
+                                    loading={loadingProf}
+                                    loadingText='Pesquisando...'
+                                    sx={{minWidth: '200px'}}
+                                    noOptionsText='Nenhum professional encontrado'
+                                    renderInput={(params) => 
+                                        <TextField {...params} 
+                                            label="Profissional" 
+                                            error={!!errors.professional}
+                                            helperText={errors.professional?.message}
+                                            fullWidth
+                                            className="custom-textfield-input"
+                                        />
+                                    }
                                 />
-                            }
+                            )}
                         />
-                    )}
-                />
-                <Controller
-                    name="patient"
-                    control={control}
-                    rules={{ validate: (value) => validateIsEmpty(value, false) }}
-                    render={({ field }) => (
-                        <Autocomplete 
-                            {...field}
-                            disablePortal
-                            value={field.value}
-                            options={patients}
-                            getOptionLabel={(option) => option.name}
-                            onInputChange={(event, input) => setInputSelectedPatient(input)}
-                            onChange={(_, value) => {
-                                field.onChange(value)
-                                setLoadingPatient(false)
-                            }}
-                            loading={loadingPatient}
-                            loadingText='Pesquisando...'
-                            sx={{width: 300}}
-                            noOptionsText='Nenhum paciente encontrado'
-                            renderInput={(params) => 
-                                <TextField {...params} 
-                                    label="Paciente" 
-                                    error={!!errors.patient}
-                                    helperText={errors.patient?.message}
+                    </Grid>
+                    <Grid item size={6}>
+                        <Controller
+                            name="patient"
+                            control={control}
+                            rules={{ validate: (value) => validateIsEmpty(value, false) }}
+                            render={({ field }) => (
+                                <Autocomplete 
+                                    {...field}
+                                    disablePortal
+                                    value={field.value}
+                                    options={patients}
+                                    getOptionLabel={(option) => option.name}
+                                    onInputChange={(event, input) => setInputSelectedPatient(input)}
+                                    onChange={(_, value) => {
+                                        field.onChange(value)
+                                        setLoadingPatient(false)
+                                    }}
+                                    loading={loadingPatient}
+                                    loadingText='Pesquisando...'
+                                    sx={{minWidth: '200px'}}
+                                    noOptionsText='Nenhum paciente encontrado'
+                                    renderInput={(params) => 
+                                        <TextField {...params} 
+                                            label="Paciente" 
+                                            error={!!errors.patient}
+                                            helperText={errors.patient?.message}
+                                            fullWidth
+                                            className="custom-textfield-input"
+                                        />
+                                    }
                                 />
-                            }
+                            )}
                         />
-                    )}
-                />
-                <Controller
-                    name="date"
-                    control={control}
-                    rules={{ validate: (value) => validateDateField(value) }}
-                    render={({ field }) => (
-                        <DatePicker 
-                            label='Data da consulta'
-                            {...field}
-                            minDate={dayjs()}
-                            format="DD/MM/YYYY"
-                            slotProps={{
-                                textField:{
-                                    error: !!errors.date,
-                                    helperText: errors.date?.message
-                                }
-                            }}
+                    </Grid>
+                    <Grid item size={4}>
+                        <Controller
+                            name="date"
+                            control={control}
+                            rules={{ validate: (value) => validateDateField(value) }}
+                            render={({ field }) => (
+                                <DatePicker 
+                                    label='Data da consulta'
+                                    {...field}
+                                    minDate={dayjs()}
+                                    format="DD/MM/YYYY"
+                                    slotProps={{
+                                        textField:{
+                                            fullWidth: true, 
+                                            className: 'custom-textfield-input', 
+                                            error: !!errors.date,
+                                            helperText: errors.date?.message
+                                        }
+                                    }}
+                                />
+                            )} 
                         />
-                    )} 
-                />
-                <Controller
-                    name="startTime"
-                    control={control}
-                    rules={{ validate: (value) => validateTimeRange(value) }}
-                    render={({ field }) => (
-                        <TimeField 
-                            {...field}
-                            label='Início'
-                            format="HH:mm"
-                            error={!!errors.startTime}
-                            helperText={errors.startTime?.message}
+                    </Grid>
+                    <Grid item size={4}>
+                        <Controller
+                            name="startTime"
+                            control={control}
+                            rules={{ validate: (value) => validateTimeRange(value) }}
+                            render={({ field }) => (
+                                <TimeField 
+                                    {...field}
+                                    label='Início'
+                                    format="HH:mm"
+                                    error={!!errors.startTime}
+                                    helperText={errors.startTime?.message}
+                                    fullWidth
+                                    className="custom-textfield-input"
+                                />
+                            )}
                         />
-                    )}
-                />
-                <Controller
-                    name="endTime"
-                    control={control}
-                    rules={{ validate: (value) => validateTimeRange(value, startTime) }}
-                    render={({ field }) => (
-                        <TimeField 
-                            {...field}
-                            label='Fim'
-                            format="HH:mm"
-                            disabled={!startTime}
-                            error={!!errors.endTime}
-                            helperText={errors.endTime?.message}
+                    </Grid>
+                    <Grid item size={4}>
+                        <Controller
+                            name="endTime"
+                            control={control}
+                            rules={{ validate: (value) => validateTimeRange(value, startTime) }}
+                            render={({ field }) => (
+                                <TimeField 
+                                    {...field}
+                                    label='Fim'
+                                    format="HH:mm"
+                                    disabled={!startTime}
+                                    error={!!errors.endTime}
+                                    helperText={errors.endTime?.message}
+                                    fullWidth
+                                    className="custom-textfield-input"
+                                />
+                            )}
                         />
-                    )}
-                />
-                <input type="submit" className="button" value="Salvar" />
+                    </Grid>
+                    <input type="submit" className="button mx-auto block" value="Salvar" />
+                </Grid>
             </form>
         </Modal>
     )

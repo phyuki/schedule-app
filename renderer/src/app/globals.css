@@ -37,6 +37,34 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+.modal {
+  background: white;
+  padding: 2rem;
+  minWidth: 300px;
+  position: relative;
+  border-radius: 5px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+.close-modal {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  top: -15px;
+  right: -15px;
+  background: #247D7F;
+  border-radius: 100%;
+  cursor: pointer;
+  color: #eee;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.75);
+}
+
+.close-modal:hover {
+  @apply bg-hover-button;
+  color: white;
+}
+
 .button-submit {
   @apply cursor-pointer;
   @apply bg-button hover:bg-hover-button text-base text-white;
@@ -73,6 +101,10 @@ body {
   @apply border-button;
 }
 
+.custom-textfield-input .MuiPickersInputBase-root.MuiPickersOutlinedInput-root.Mui-focused fieldset {
+  @apply border-button;
+}
+
 .custom-textfield-input .MuiInputLabel-root.MuiInputLabel-shrink {
   color: #4b5563;
   font-size: 1rem;
@@ -81,7 +113,6 @@ body {
 .custom-textfield-input .MuiInputLabel-root.MuiInputLabel-shrink.Mui-focused {
   @apply text-button;
 }
-
 
 .fc .fc-button,
 .fc .fc-button-primary {

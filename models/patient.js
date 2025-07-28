@@ -11,7 +11,15 @@ const Patient = sequelize.define('patient', {
     allowNull: false,
   },
   phone: {
-    type: DataTypes.STRING(11),
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  cpf: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  birthDate: {
+    type: DataTypes.DATEONLY,
     allowNull: false,
   },
 });

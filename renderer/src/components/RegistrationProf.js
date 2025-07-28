@@ -1,10 +1,10 @@
 import { Grid, TextField } from "@mui/material";
 
 import RegistrationForm from "./RegistrationForm";
-import PhoneInput from "./PhoneInput";
 import { Controller, useForm } from "react-hook-form";
 import { DatePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
+import { CpfMaskCustom, PhoneMaskCustom } from "./Masks";
 
 export default function RegistrationProf() {
     
@@ -129,6 +129,11 @@ export default function RegistrationProf() {
                             helperText={fieldState.error?.message}
                             fullWidth
                             className="custom-textfield-input"
+                            slotProps={{
+                                input: {
+                                    inputComponent: CpfMaskCustom
+                                }
+                            }}
                         />
                     }
                 />
@@ -161,11 +166,18 @@ export default function RegistrationProf() {
                     control={control}
                     rules={{ validate: (value) => validatePhoneNumber(value) }}
                     render={({ field, fieldState }) => 
-                        <PhoneInput 
-                            value={field.value}
-                            onChange={field.onChange}
-                            helperText={fieldState.error}
+                        <TextField 
+                            {...field}
+                            label="Telefone"
+                            error={!!fieldState.error}
+                            helperText={fieldState.error?.message}
+                            fullWidth
                             className="custom-textfield-input"
+                            slotProps={{
+                                input: {
+                                    inputComponent: PhoneMaskCustom
+                                }
+                            }}
                         />
                     }
                 />
