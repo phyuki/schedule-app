@@ -25,6 +25,9 @@ const Progress = sequelize.define('progress', {
     allowNull: false
   }
 }, {
+  paranoid: true, 
+  timestamps: true, 
+  deletedAt: "deletedAt",
   freezeTableName: true
 });
 

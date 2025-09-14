@@ -36,6 +36,10 @@ const Session = sequelize.define('session', {
     },
     allowNull: false
   }
+}, {
+  paranoid: true, 
+  timestamps: true, 
+  deletedAt: "deletedAt",
 });
 
 module.exports = Session;

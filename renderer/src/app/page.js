@@ -8,19 +8,15 @@ import "../styles/loading-page.css"
 export default function Home() {
 
   useEffect(() => {
-
-    setTimeout(() => {
-        window.clinicAPI.searchClinic().then((exists) => {
-            if(exists) {
-              window.location.href = "/menu"
-            } 
-            else {
-              window.location.href = "/register/clinic"
-            }
-        }).catch((err) => {
-            console.error('Erro Interno - 500: ' + err)
-        })
+    const timer = setTimeout(() => {
+      try {
+        window.location.href = "/menu"
+      } catch (err) {
+        console.error('Erro Interno - 500: ' + err)
+      }
     }, 4000)
+
+    return () => clearTimeout(timer)
   }, [])
 
   return (

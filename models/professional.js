@@ -22,6 +22,10 @@ const Professional = sequelize.define('professional', {
     type: DataTypes.DATEONLY,
     allowNull: false,
   },
+}, {
+  paranoid: true, 
+  timestamps: true, 
+  deletedAt: "deletedAt",
 });
 
 module.exports = Professional;

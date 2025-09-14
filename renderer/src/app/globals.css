@@ -7,6 +7,8 @@
   --fc-border-color: #000;
   --fc-event-bg-color: #247D7F;
   --fc-event-border-color: #247D7F;
+  --button: #247D7F;
+  --hover-button: #207172;
 }
 
 @theme {
@@ -37,9 +39,15 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
 .modal {
   background: white;
-  padding: 2rem;
+  padding: 1rem;
   minWidth: 300px;
   position: relative;
   border-radius: 5px;
@@ -68,11 +76,43 @@ body {
 .button-submit {
   @apply cursor-pointer;
   @apply bg-button hover:bg-hover-button text-base text-white;
-  @apply p-3;
 }
 
-.button-register {
-  @apply rounded-[20px] my-5  mx-4;
+.button {
+    padding: 10px;
+    border: none;
+    background-color: #247D7F;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 14px;
+    color: white;
+}
+
+.button:hover {
+    background-color: #207172;
+}
+
+.register-button {
+  padding: 12px;
+  font-size: 15px;
+}
+
+.delete {
+  background-color: #9a9a9a;
+}
+
+.delete:hover {
+  background-color: #888;
+}
+
+.edit-button {
+  @apply cursor-pointer;
+  @apply hover:text-hover-button text-base text-button;
+  @apply p-2 mx-2;
+}
+
+.main-icon {
+  @apply p-2 rounded-[10px]  ml-4;
 }
 
 .form-item {
@@ -80,12 +120,12 @@ body {
 }
 
 .main-menu-item {
-  @apply w-32 cursor-pointer;
+  @apply cursor-pointer;
   @apply hover:bg-light-white hover:text-menu;
 }
 
 .custom-textfield-input {
-  @apply bg-light-white;
+  @apply bg-light-white rounded;
   width: 100%;
 }
 
@@ -156,4 +196,69 @@ body {
 
 .fc-direction-ltr .fc-timegrid-col-events {
   margin: 0px !important;
+}
+
+.MuiPaginationItem-root {
+  font-size: 1.25rem !important; 
+  color: var(--button) !important;
+  background-color: white !important;
+  padding: 0 15px !important;
+}
+
+.MuiPaginationItem-icon {
+  font-size: 1.5rem !important;
+}
+
+.Mui-selected {
+  background-color: var(--button) !important;
+  color: white !important;
+}
+
+.MuiPaginationItem-root:hover:not(.Mui-selected) {
+  background-color: #eff6ff !important;
+}
+
+.MuiDataGrid-columnHeader {
+  background-color: var(--color-button) !important;
+  color: #fff;
+  font-size: 15 !important;
+}
+
+.MuiDataGrid-columnHeaderTitle {
+  font-weight: 600 !important;
+}
+
+.MuiToolbar-root {
+  background-color: var(--color-button) !important;
+  color: #fff;
+  font-size: 15 !important;
+}
+
+.MuiTablePagination-displayedRows {
+  font-weight: 600 !important;
+}
+
+.MuiDataGrid-root .MuiTablePagination-root .MuiIconButton-root svg {
+  width: 30px;   /* largura do ícone */
+  height: 30px;
+  color: #fff; 
+}
+
+.MuiDataGrid-root .MuiTablePagination-root .MuiIconButton-root.Mui-disabled svg {
+  color: rgba(255, 255, 255, 0.5); /* branca mais clara, "apagada" */
+}
+
+.MuiDataGrid-root .MuiDataGrid-cell:focus,
+.MuiDataGrid-root .MuiDataGrid-cell:focus-within,
+.MuiDataGrid-root .MuiDataGrid-columnHeader:focus,
+.MuiDataGrid-root .MuiDataGrid-columnHeader:focus-within {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.MuiDataGrid-root .MuiDataGrid-cell:focus::after,
+.MuiDataGrid-root .MuiDataGrid-cell:focus-within::after,
+.MuiDataGrid-root .MuiDataGrid-columnHeader:focus::after,
+.MuiDataGrid-root .MuiDataGrid-columnHeader:focus-within::after {
+  border: none !important;
 }

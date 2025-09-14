@@ -32,27 +32,12 @@ html, body {
 }
 
 .item-menu {
-    width: 120px;
     border-radius: 10%;
     cursor: pointer;
 }
 
 .item-menu:hover {
     background-color: rgb(45, 155, 155);
-}
-
-.button {
-    padding: 10px;
-    border: none;
-    border-radius: 80px;
-    background-color: #247D7F;
-    cursor: pointer;
-    font-size: 15px;
-    color: white;
-}
-
-.button:hover {
-    background-color: #207172;
 }
 
 .button:disabled {

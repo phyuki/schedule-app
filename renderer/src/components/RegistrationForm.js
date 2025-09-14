@@ -1,5 +1,5 @@
-import { Autocomplete, Card, CardContent, Grid, Snackbar, TextField } from "@mui/material"
-import { UserCirclePlus, UserPlus } from "phosphor-react"
+import { Alert, Autocomplete, Card, CardContent, Grid, Snackbar, TextField } from "@mui/material"
+import { UserCirclePlus, CheckCircle, WarningCircle, Info, XCircle } from "phosphor-react"
 import { useEffect, useState } from "react"
 
 export default function RegistrationForm ({ 
@@ -14,6 +14,7 @@ export default function RegistrationForm ({
     
     const [snackbarOpen, setSnackbarOpen] = useState(false)
     const [snackbarMessage, setSnackbarMessage] = useState('')
+    const [severityMessage, setSeverityMessage] = useState('')
     const [loading, setLoading] = useState(false)
     const [isRegister, setIsRegister] = useState(true)
     
@@ -70,11 +71,13 @@ export default function RegistrationForm ({
 
         if(result) {
             setSnackbarMessage(successMessage)
+            setSeverityMessage("success")
             setOptions([result])
             setSelected(result)
             
             if(isRegister) setIsRegister(false)
         } else {
+            setSeverityMessage("error")
             setSnackbarMessage("Não foi possível efetuar esta operação - Tente Novamente!")
         }
 
@@ -83,18 +86,14 @@ export default function RegistrationForm ({
 
     function onError( errors ) {
         setSnackbarMessage("Preencha os campos apropriadamente!")
+        setSeverityMessage("warning")
         setSnackbarOpen(true) 
     }
 
     return (
         <div className="flex flex-col flex-1 relative">
-            <Snackbar 
-                open={snackbarOpen}
-                autoHideDuration={3000}
-                onClose={() => setSnackbarOpen(false)}
-                message={snackbarMessage}
-            />
-            <div className="flex flex-row items-center justify-center my-4">
+            
+            <div className="flex flex-row items-center justify-center my-6">
                 <Autocomplete 
                     className="w-[18%] min-w-2xs mx-4"
                     disablePortal
@@ -107,11 +106,11 @@ export default function RegistrationForm ({
                     noOptionsText={noOptionsText}
                     renderInput={(params) => <TextField {...params} className="custom-textfield-input" label={searchLabel} />}
                 />
-                <button className="button-submit button-register" onClick={switchToRegister}>
+                <button className="button-submit main-icon" onClick={switchToRegister}>
                     <UserCirclePlus size={32} />
                 </button>
             </div>
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+            <div>
                 <Card
                     sx={{mx: 'auto', px: 2, py: 5, bgcolor: 'gray.100', maxWidth: '700px'}}
                     elevation={24}
@@ -121,8 +120,8 @@ export default function RegistrationForm ({
                             <Grid container spacing={4.5}>
                                 {children}
                                 <Grid item size={6} 
-                                sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'flex-end' }}>
-                                    <input type="submit" className="button-submit rounded-[10px]"
+                                sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
+                                    <input type="submit" className="button rounded"
                                     value={isRegister ? "Cadastrar" : "Atualizar"} />
                                 </Grid>
                             </Grid>

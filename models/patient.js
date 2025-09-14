@@ -21,7 +21,11 @@ const Patient = sequelize.define('patient', {
   birthDate: {
     type: DataTypes.DATEONLY,
     allowNull: false,
-  },
+  }
+}, {
+  paranoid: true, 
+  timestamps: true, 
+  deletedAt: "deletedAt",
 });
 
 module.exports = Patient;
