@@ -52,8 +52,12 @@ export default function ProgressForm({
   const [loadingPatient, setLoadingPatient] = useState(false);
 
   async function fetchProfessionals(search) {
-    const result = await window.professionalAPI.searchProfessionals(search);
-    setProfessionals(result);
+    const sorting = { sortBy: "name", sortDir: "ASC" };
+    const result = await window.professionalAPI.searchProfessionals(
+      search,
+      sorting
+    );
+    setProfessionals(result.professionals);
     setLoadingProf(false);
   }
 
@@ -63,7 +67,7 @@ export default function ProgressForm({
       search,
       sorting
     );
-    setPatients(patients);
+    setPatients(patients || []);
     setLoadingPatient(false);
   }
 
@@ -265,7 +269,9 @@ export default function ProgressForm({
                       disablePortal
                       value={field.value}
                       options={patients}
-                      getOptionLabel={(option) => option.name}
+                      getOptionLabel={(option) =>
+                        option ? option.name : option
+                      }
                       onInputChange={(event, input) =>
                         setInputSelectedPatient(input)
                       }

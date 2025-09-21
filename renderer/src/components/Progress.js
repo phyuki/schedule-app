@@ -98,8 +98,15 @@ export default function Progress({ patient }) {
     }
   }
 
-  function downloadProgress() {
-    console.log(sorting);
+  async function downloadProgress() {
+    if (!selected) {
+      setSnackbarMessage(`Selecione um paciente!`);
+      setSeverityMessage("error");
+      setSnackbarOpen(true);
+      return;
+    }
+    const { patient, data } = await window.progressAPI.fetchAllProgress(selected.id);
+    return window.reportAPI.createReport(patient, data);
   }
 
   const refreshProgress = (patient) => {
@@ -203,14 +210,16 @@ export default function Progress({ patient }) {
             <NotePencil size={32} />
           </button>
         </Tooltip>
-        <Tooltip title="Download Histórico" arrow placement="top">
-          <button
-            className="button-submit main-icon"
-            onClick={downloadProgress}
-          >
-            <FilePdf size={32} />
-          </button>
-        </Tooltip>
+        {!!selected &&
+          <Tooltip title="Download Histórico" arrow placement="top">
+            <button
+              className="button-submit main-icon"
+              onClick={downloadProgress}
+            >
+              <FilePdf size={32} />
+            </button>
+          </Tooltip>
+        }
       </div>
       {sorting.totalPages > 0 && (
         <div className="flex flex-col flex-1">
