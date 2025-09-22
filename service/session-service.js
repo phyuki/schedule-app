@@ -79,9 +79,24 @@ async function updateSession( sessionId, session ) {
     }
 }
 
+async function deleteSessionById( id ) {
+  try {
+      const result = await Session.destroy({
+          where: {
+              id
+          },
+      });
+      return result;
+  } catch (err) {
+      console.log("SQL Error: "+err)
+      return false
+  }
+}
+
 module.exports = { 
     findSessionsByProfessional, 
     findSessionsByDate, 
     createSession,
-    updateSession
+    updateSession,
+    deleteSessionById
 }

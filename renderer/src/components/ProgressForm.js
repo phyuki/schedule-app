@@ -6,6 +6,7 @@ import {
   Grid,
   Snackbar,
   TextField,
+  Typography,
 } from "@mui/material";
 import Modal from "./Modal";
 
@@ -195,13 +196,13 @@ export default function ProgressForm({
             marginRight: 2,
           }}
           iconMapping={{
-            success: <CheckCircle sx={{ color: "green" }} size={32} />,
-            error: <XCircle sx={{ color: "red" }} size={32} />,
-            warning: <WarningCircle sx={{ color: "orange" }} size={32} />,
-            info: <Info sx={{ color: "blue" }} size={32} />,
+            success: <CheckCircle sx={{ color: "green" }} size={40} />,
+            error: <XCircle sx={{ color: "red" }} size={40} />,
+            warning: <WarningCircle sx={{ color: "orange" }} size={40} />,
+            info: <Info sx={{ color: "blue" }} size={40} />,
           }}
         >
-          {snackbarMessage}
+          <Typography fontWeight="bold">{snackbarMessage}</Typography>
         </Alert>
       </Snackbar>
       <div className="mx-3">

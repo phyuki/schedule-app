@@ -3,6 +3,22 @@ const { jsPDF } = require("jspdf");
 const montserratNormal = require("./fonts/Montserrat-normal.js");
 const montserratBold = require("./fonts/Montserrat-bold.js");
 
+function formatDate(date) {
+  const dia = String(date.getDate()).padStart(2, "0");
+  const mes = String(date.getMonth() + 1).padStart(2, "0");
+  const ano = date.getFullYear();
+  const hora = String(date.getHours()).padStart(2, "0");
+  const min = String(date.getMinutes()).padStart(2, "0");
+  const seg = String(date.getSeconds()).padStart(2, "0");
+
+  return `${dia}${mes}${ano}${hora}${min}${seg}`;
+}
+
+function formatName (name) {
+    const split = name.split(" ");
+    return `${split[0]}_${split[split.length - 1]}`;
+  };
+
 function setFonts(doc) {
   doc.addFileToVFS("Montserrat-Regular.ttf", montserratNormal);
   doc.addFont("Montserrat-Regular.ttf", "Montserrat", "normal");
@@ -132,7 +148,14 @@ function createReport(patient, data) {
     y = addParagraphJustified(doc, element.subject, marginLeft, y) + 5;
   });
 
-  doc.save("a4.pdf");
+  const today = formatDate(new Date());
+  const patientName = patient.name
+    .toLowerCase()
+    .normalize("NFD") 
+    .replace(/[\u0300-\u036f]/g, "");
+  const formatPatientName = formatName(patientName);
+  const fileName = "relatorio_" + formatPatientName + "_"+ today +".pdf";
+  doc.save(fileName);
   return true;
 }
 

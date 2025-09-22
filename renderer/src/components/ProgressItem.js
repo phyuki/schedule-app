@@ -1,13 +1,28 @@
 import { Button, Card, CardContent, CardHeader, Tooltip, Typography } from "@mui/material";
 import dayjs from "dayjs";
 import { PencilSimple } from "phosphor-react";
-import { useState } from "react";
+import { useRef, useState, useEffect } from "react";
 
 export default function ProgressItem({ progress, handleEditProgress }) {
   const { title, professional, updatedAt, subject } = progress;
   const lastUpdate = dayjs(updatedAt).format("DD/MM/YYYY HH:mm");
 
   const [expanded, setExpanded] = useState(false);
+  const [showButton, setShowButton] = useState(false);
+  const textRef = useRef(null);
+
+  useEffect(() => {
+    if (textRef.current) {
+      const lineHeight = parseFloat(
+        window.getComputedStyle(textRef.current).lineHeight
+      );
+      const maxHeight = lineHeight * 3; 
+
+      if (textRef.current.scrollHeight > maxHeight) {
+        setShowButton(true);
+      }
+    }
+  }, []);
 
   return (
     <Card sx={{ bgcolor: "white", borderRadius: "5px", m: "10px", p: "5px" }}>
@@ -44,6 +59,7 @@ export default function ProgressItem({ progress, handleEditProgress }) {
       />
       <CardContent sx={{ mt: "-5px" }}>
         <Typography
+          ref={textRef}
           sx={{
             textAlign: "justify",
             display: "-webkit-box",
@@ -54,22 +70,24 @@ export default function ProgressItem({ progress, handleEditProgress }) {
         >
           {subject}
         </Typography>
-        <Button
-          size="small"
-          onClick={() => setExpanded(!expanded)}
-          sx={{
-            fontSize: "0.75rem",
-            p: "0 !important",
-            fontWeight: "600",
-            color: "var(--color-button)", 
-            "&:hover": {
-              color: "var(--color-hover-button)", 
-              backgroundColor: "transparent", 
-            },
-          }}
-        >
-          {expanded ? "Ver Menos" : "Ver Mais"}
-        </Button>
+        {showButton && 
+          <Button
+            size="small"
+            onClick={() => setExpanded(!expanded)}
+            sx={{
+              fontSize: "0.75rem",
+              p: "0 !important",
+              fontWeight: "600",
+              color: "var(--color-button)", 
+              "&:hover": {
+                color: "var(--color-hover-button)", 
+                backgroundColor: "transparent", 
+              },
+            }}
+          >
+            {expanded ? "Ver Menos" : "Ver Mais"}
+          </Button>
+        }
       </CardContent>
     </Card>
   );

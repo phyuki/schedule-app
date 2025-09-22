@@ -1,9 +1,9 @@
 import FullCalendar from "@fullcalendar/react";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import { useEffect, useRef, useState } from "react";
-import { Autocomplete, Card, CardContent, TextField } from "@mui/material";
+import { Alert, Autocomplete, Card, CardContent, Snackbar, TextField, Typography } from "@mui/material";
 import ScheduleForm from "./ScheduleForm";
-import { CalendarPlus } from "phosphor-react";
+import { CalendarPlus, CheckCircle, Info, WarningCircle, XCircle } from "phosphor-react";
 
 export default function Schedule() {
   const calendarRef = useRef();
@@ -19,6 +19,10 @@ export default function Schedule() {
   const [activeRange, setActiveRange] = useState({ start: "", end: "" });
 
   const [selectedSession, setSelectedSession] = useState({});
+
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [severityMessage, setSeverityMessage] = useState("");
 
   async function fetchProfessionals(search) {
     const sorting = { sortBy: "name", sortDir: "ASC" };
@@ -134,8 +138,42 @@ export default function Schedule() {
           setModalVisible={setModalVisible}
           defaultContent={selectedSession}
           refreshSessions={refreshSessions}
+          professionalId={scheduleProf?.id}
+          activeWeek={fetchCalendarWeek()}
+          fetchSessions={fetchSessions}
+          setSnackbarMessage={setSnackbarMessage}
+          setSnackbarOpen={setSnackbarOpen}
+          setSeverityMessage={setSeverityMessage}
         />
       )}
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={3000}
+        onClose={() => setSnackbarOpen(false)}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        sx={{ top: "100px !important" }}
+      >
+        <Alert
+          severity={severityMessage}
+          sx={{
+            backgroundColor: "#fff",
+            color: "#333",
+            border: "1px solid #ccc",
+            boxShadow: 2,
+            minWidth: "300px",
+            alignItems: "center",
+            marginRight: 2,
+          }}
+          iconMapping={{
+            success: <CheckCircle sx={{ color: "green" }} size={40} />,
+            error: <XCircle sx={{ color: "red" }} size={40} />,
+            warning: <WarningCircle sx={{ color: "orange" }} size={40} />,
+            info: <Info sx={{ color: "blue" }} size={40} />,
+          }}
+        >
+          <Typography fontWeight="bold">{snackbarMessage}</Typography>
+        </Alert>
+      </Snackbar>
       <Card sx={{ mt: 1,  mb: 4, py: 1, bgcolor: "gray.100" }} elevation={24}>
         <CardContent className="overflow-y-auto max-h-[calc(100vh-130px)]">
           <div className="flex flex-row items-center">

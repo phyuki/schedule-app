@@ -6,6 +6,7 @@ import {
   TextField,
   ThemeProvider,
   Tooltip,
+  Typography,
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { ptBR } from "@mui/x-data-grid/locales";
@@ -121,6 +122,9 @@ export default function ListProfessionals() {
     }
     setSnackbarOpen(true)
     setConfirmationModal(false)
+    if (result) {
+      fetchProfessionals()
+    }
   };
 
   const handleSearchChange = async (event) => {
@@ -160,13 +164,13 @@ export default function ListProfessionals() {
             marginRight: 2,
           }}
           iconMapping={{
-            success: <CheckCircle sx={{ color: "green" }} size={32} />,
-            error: <XCircle sx={{ color: "red" }} size={32} />,
-            warning: <WarningCircle sx={{ color: "orange" }} size={32} />,
-            info: <Info sx={{ color: "blue" }} size={32} />,
+            success: <CheckCircle sx={{ color: "green" }} size={40} />,
+            error: <XCircle sx={{ color: "red" }} size={40} />,
+            warning: <WarningCircle sx={{ color: "orange" }} size={40} />,
+            info: <Info sx={{ color: "blue" }} size={40} />,
           }}
         >
-          {snackbarMessage}
+          <Typography fontWeight="bold">{snackbarMessage}</Typography>
         </Alert>
       </Snackbar>
       {modalVisible && (

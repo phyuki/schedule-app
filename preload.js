@@ -1,7 +1,7 @@
 const { contextBridge } = require('electron');
 const { searchClinic, createClinic } = require('./service/clinic-service');
-const { createProfessional, fetchAllProfessionals, searchProfessionals, updateProfessional } = require('./service/professional-service');
-const { findSessionsByProfessional, createSession, findSessionsByDate, updateSession } = require('./service/session-service');
+const { createProfessional, fetchAllProfessionals, searchProfessionals, updateProfessional, deleteProfessionalById } = require('./service/professional-service');
+const { findSessionsByProfessional, createSession, findSessionsByDate, updateSession, deleteSessionById } = require('./service/session-service');
 const { searchPatients, createPatient, updatePatient, deleteById } = require('./service/patient-service');
 const { findProgressByPatient, createProgress, updateProgress, fetchAllProgress } = require('./service/progress-service');
 const { createReport } = require('./service/report-service');
@@ -16,14 +16,15 @@ contextBridge.exposeInMainWorld('professionalAPI', {
   fetchAllProfessionals: async () => await fetchAllProfessionals(),
   searchProfessionals: async (search, sorting, pagination) => await searchProfessionals(search, sorting, pagination),
   updateProfessional: async (professionalId, professional) => await updateProfessional(professionalId, professional),
-  deleteById: async (id) => await deleteById(id)
+  deleteById: async (id) => await deleteProfessionalById(id)
 })
 
 contextBridge.exposeInMainWorld('sessionAPI', {
   findSessionsByProfessional: async (professionalId, activeWeek) => await findSessionsByProfessional(professionalId, activeWeek),
   findSessionsByDate: async (professionalId, date) => await findSessionsByDate(professionalId, date),
   createSession: async (session) => await createSession(session),
-  updateSession: async (sessionId, session) => await updateSession(sessionId, session)
+  updateSession: async (sessionId, session) => await updateSession(sessionId, session),
+  deleteById: async (id) => await deleteSessionById(id),
 })
 
 contextBridge.exposeInMainWorld('patientAPI', {

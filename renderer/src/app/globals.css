@@ -186,6 +186,13 @@ html, body {
   }
 }
 
+.fc .fc-event,
+.fc .fc-daygrid-event,
+.fc .fc-timegrid-event,
+.fc .fc-event-main {
+  @apply cursor-pointer;
+}
+
 .fc .fc-timegrid-slot {
   height: 30px;
 }

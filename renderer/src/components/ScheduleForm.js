@@ -1,4 +1,14 @@
-import { Alert, Autocomplete, CardContent, CardHeader, Grid, Snackbar, TextField } from "@mui/material";
+import {
+  Alert,
+  Autocomplete,
+  Button,
+  CardContent,
+  CardHeader,
+  Grid,
+  Snackbar,
+  TextField,
+  Typography,
+} from "@mui/material";
 import Modal from "./Modal";
 import { DatePicker, TimeField } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
@@ -6,12 +16,18 @@ import "dayjs/locale/pt-br";
 
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { CheckCircle, Info, WarningCircle, XCircle } from "phosphor-react";
+import DeleteConfirmation from "./DeleteConfirmation";
 
 export default function ScheduleForm({
   setModalVisible,
   defaultContent,
   refreshSessions,
+  professionalId,
+  activeWeek,
+  fetchSessions,
+  setSnackbarMessage,
+  setSnackbarOpen,
+  setSeverityMessage,
 }) {
   const {
     register,
@@ -46,15 +62,17 @@ export default function ScheduleForm({
   );
   const [inputSelectedPatient, setInputSelectedPatient] = useState("");
 
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState("");
-  const [severityMessage, setSeverityMessage] = useState("");
   const [loadingProf, setLoadingProf] = useState(false);
   const [loadingPatient, setLoadingPatient] = useState(false);
+  const [confirmationModal, setConfirmationModal] = useState(false);
 
   async function fetchProfessionals(search) {
-    const result = await window.professionalAPI.searchProfessionals(search);
-    setProfessionals(result);
+    const sorting = { sortBy: "name", sortDir: "ASC" };
+    const result = await window.professionalAPI.searchProfessionals(
+      search,
+      sorting
+    );
+    setProfessionals(result.professionals);
     setLoadingProf(false);
   }
 
@@ -233,6 +251,7 @@ export default function ScheduleForm({
         registerSession(filterResult, session, professional, false);
       } else {
         setSnackbarMessage("Horário idêntico ao cadastrado!");
+        return;
       }
     } else {
       registerSession(result, session, professional, true);
@@ -240,6 +259,26 @@ export default function ScheduleForm({
 
     clearErrors([["startTime", "endTime"]]);
     setSnackbarOpen(true);
+    setModalVisible(false);
+  };
+  
+  const onDeleteSession = async () => {
+    const result = await window.sessionAPI.deleteById(defaultContent.id);
+    if (result) {
+      setSnackbarMessage("Consulta excluída com sucesso!");
+      setSeverityMessage("success");
+    } else {
+      setSeverityMessage("error");
+      setSnackbarMessage(
+        "Não foi possível efetuar esta operação - Tente Novamente!"
+      );
+    }
+    setSnackbarOpen(true);
+    if (result) {
+      await fetchSessions(professionalId, activeWeek);
+    }
+    setConfirmationModal(false);
+    setModalVisible(false);
   };
 
   const onError = (errors) => {
@@ -256,36 +295,20 @@ export default function ScheduleForm({
     setModalVisible(false);
   };
 
+  const handleConfirmationClose = async () => {
+    setConfirmationModal(false);
+  }
+
   return (
     <Modal callback={handleCLose}>
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={3000}
-        onClose={() => setSnackbarOpen(false)}
-        anchorOrigin={{ vertical: "top", horizontal: "right" }}
-        sx={{ top: "100px !important" }}
-      >
-        <Alert
-          severity={severityMessage}
-          sx={{
-            backgroundColor: "#fff",
-            color: "#333",
-            border: "1px solid #ccc",
-            boxShadow: 2,
-            minWidth: "300px",
-            alignItems: "center",
-            marginRight: 2,
-          }}
-          iconMapping={{
-            success: <CheckCircle sx={{ color: "green" }} size={32} />,
-            error: <XCircle sx={{ color: "red" }} size={32} />,
-            warning: <WarningCircle sx={{ color: "orange" }} size={32} />,
-            info: <Info sx={{ color: "blue" }} size={32} />,
-          }}
-        >
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
+      {confirmationModal && (
+        <Modal callback={handleConfirmationClose} className={"modal w-[30%]"}>
+          <DeleteConfirmation
+            handleClose={handleConfirmationClose}
+            handleDelete={onDeleteSession}
+          />
+        </Modal>
+      )}
       <div className="mx-3">
         <CardHeader
           title={"Marcar Consulta"}
@@ -312,7 +335,9 @@ export default function ScheduleForm({
                       disablePortal
                       value={field.value}
                       options={professionals}
-                      getOptionLabel={(option) => (option ? option.name : option)}
+                      getOptionLabel={(option) =>
+                        option ? option.name : option
+                      }
                       onInputChange={(event, input) =>
                         setInputSelectedProf(input)
                       }
@@ -449,23 +474,22 @@ export default function ScheduleForm({
                   )}
                 />
               </Grid>
-              <Grid
-                item
-                size={12}
-                sx={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  mb: -2
-                }}
-              >
-                <input
-                  type="submit"
-                  className="button register-button rounded mx-auto block uppercase font-sans"
-                  value="Salvar"
-                />
-              </Grid>
             </Grid>
+            <div className="flex flex-row justify-center gap-8 mt-8">
+              <input
+                type="submit"
+                className="button register-button rounded block uppercase font-sans"
+                value={defaultContent.id ? "Atualizar" : "Salvar"}
+              />
+              {defaultContent.id && (
+                <button
+                  className="button delete rounded uppercase font-sans"
+                  onClick={() => setConfirmationModal(true)}
+                >
+                  Excluir
+                </button>
+              )}
+            </div>
           </form>
         </CardContent>
       </div>

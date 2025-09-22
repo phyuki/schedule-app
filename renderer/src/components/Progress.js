@@ -168,18 +168,18 @@ export default function Progress({ patient }) {
             color: "#333",
             border: "1px solid #ccc",
             boxShadow: 2,
-            minWidth: "300px",
+            minWidth: "200px",
             alignItems: "center",
             marginRight: 2,
           }}
           iconMapping={{
-            success: <CheckCircle sx={{ color: "green" }} size={32} />,
-            error: <XCircle sx={{ color: "red" }} size={32} />,
-            warning: <WarningCircle sx={{ color: "orange" }} size={32} />,
-            info: <Info sx={{ color: "blue" }} size={32} />,
+            success: <CheckCircle sx={{ color: "green" }} size={40} />,
+            error: <XCircle sx={{ color: "red" }} size={40} />,
+            warning: <WarningCircle sx={{ color: "orange" }} size={40} />,
+            info: <Info sx={{ color: "blue" }} size={40} />,
           }}
         >
-          {snackbarMessage}
+          <Typography fontWeight="bold">{snackbarMessage}</Typography>
         </Alert>
       </Snackbar>
       <div className="flex flex-row items-center mt-2 mb-4">

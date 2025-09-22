@@ -60,9 +60,9 @@ async function updateProfessional( professionalId, professional ) {
   }
 }
 
-async function deleteById( id ) {
+async function deleteProfessionalById( id ) {
   try {
-      const result = await Patient.destroy({
+      const result = await Professional.destroy({
           where: {
               id
           },
@@ -79,5 +79,5 @@ module.exports = {
     fetchAllProfessionals, 
     searchProfessionals, 
     updateProfessional,
-    deleteById
+    deleteProfessionalById
 }
