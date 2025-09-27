@@ -25,9 +25,11 @@ import { useRef, useState, useEffect } from "react";
 import Modal from "./Modal";
 import RegistrationProf from "./RegistrationProf";
 import DeleteConfirmation from "./DeleteConfirmation";
+import Loading from "./Loading";
 
 export default function ListProfessionals() {
   const theme = createTheme(ptBR);
+  const [loading, setLoading] = useState(false); 
 
   const pageSize = 10;
   const columns = [
@@ -96,6 +98,7 @@ export default function ListProfessionals() {
   }, [paginationModel]);
 
   async function fetchProfessionals(search) {
+    setLoading(true);
     const sorting = {
       sortBy: "updatedAt",
       sortDir: "DESC",
@@ -107,11 +110,13 @@ export default function ListProfessionals() {
       sorting,
       true
     );
+    setLoading(false)
     setRowCount(result.total);
     setProfessionals(result.professionals);
   }
 
   const onDeleteProfessional = async () => {
+    setLoading(true)
     const result = await window.professionalAPI.deleteById(professional.id)
     if (result) {
         setSnackbarMessage("Profissional excluído com sucesso!")
@@ -119,6 +124,7 @@ export default function ListProfessionals() {
     } else {
         setSeverityMessage("error")
         setSnackbarMessage("Não foi possível efetuar esta operação - Tente Novamente!")
+        setLoading(false)
     }
     setSnackbarOpen(true)
     setConfirmationModal(false)
@@ -145,6 +151,7 @@ export default function ListProfessionals() {
 
   return (
     <>
+      {loading && <Loading />}
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={3000}
@@ -182,6 +189,7 @@ export default function ListProfessionals() {
             setSnackbarMessage={setSnackbarMessage}
             setSeverityMessage={setSeverityMessage}
             fetchProfessionals={fetchProfessionals}
+            setLoading={setLoading}
           />
         </Modal>
       )}
@@ -199,7 +207,7 @@ export default function ListProfessionals() {
       )}
       <div className="flex flex-row items-center mt-2 mb-4">
         <TextField
-          placeholder="Pesquisa por nome"
+          placeholder="Digite e pressione Enter"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           onKeyDown={handleSearchChange}

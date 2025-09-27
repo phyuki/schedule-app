@@ -18,6 +18,7 @@ export default function ProgressForm({
   setModalVisible,
   defaultContent,
   refreshProgress,
+  setLoading
 }) {
   const {
     register,
@@ -121,11 +122,12 @@ export default function ProgressForm({
 
   async function registerProgress(progress, patient, toCreate) {
     const message = toCreate ? "cadastrada" : "atualizada";
-
+    
+    setLoading(true);
     const response = toCreate
       ? await window.progressAPI.createProgress(progress)
       : await window.progressAPI.updateProgress(defaultContent.id, progress);
-
+    
     if (response) {
       setSnackbarMessage(`Evolução ${message} com sucesso!`);
       setSeverityMessage("success");
@@ -135,6 +137,7 @@ export default function ProgressForm({
         "Não foi possível marcar esta consulta - Tente Novamente!"
       );
       setSeverityMessage("error");
+      setLoading(false);
     }
   }
 

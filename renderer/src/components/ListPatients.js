@@ -25,6 +25,7 @@ import { useRef, useState, useEffect } from "react";
 import Modal from "./Modal";
 import RegistrationPatient from "./RegistrationPatient";
 import DeleteConfirmation from "./DeleteConfirmation";
+import Loading from "./Loading";
 
 export default function ListPatients({
   setContent,
@@ -100,17 +101,18 @@ export default function ListPatients({
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [severityMessage, setSeverityMessage] = useState("");
   const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [loading, setLoading] = useState(false); 
 
   useEffect(() => {
     fetchPatients();
   }, []);
 
   useEffect(() => {
-    console.log(paginationModel);
     fetchPatients(search);
   }, [paginationModel]);
 
   async function fetchPatients(search) {
+    setLoading(true);
     const sorting = {
       sortBy: "updatedAt",
       sortDir: "DESC",
@@ -124,9 +126,11 @@ export default function ListPatients({
     );
     setRowCount(result.total);
     setPatients(result.patients);
+    setLoading(false);
   }
 
   const onDeletePatient = async () => {
+    setLoading(true);
     const result = await window.patientAPI.deleteById(patient.id)
     if (result) {
         setSnackbarMessage("Paciente excluído com sucesso!")
@@ -134,6 +138,7 @@ export default function ListPatients({
     } else {
         setSeverityMessage("error")
         setSnackbarMessage("Não foi possível efetuar esta operação - Tente Novamente!")
+        setLoading(false)
     }
     setSnackbarOpen(true)
     setConfirmationModal(false)
@@ -160,6 +165,7 @@ export default function ListPatients({
 
   return (
     <>
+      {loading && <Loading />}
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={3000}
@@ -197,6 +203,7 @@ export default function ListPatients({
             setSnackbarMessage={setSnackbarMessage}
             setSeverityMessage={setSeverityMessage}
             fetchPatients={fetchPatients}
+            setLoading={setLoading}
           />
         </Modal>
       )}
@@ -214,7 +221,7 @@ export default function ListPatients({
       )}
       <div className="flex flex-row items-center mt-2 mb-4">
         <TextField
-          placeholder="Pesquisa por nome"
+          placeholder="Digite e pressione Enter"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           onKeyDown={handleSearchChange}

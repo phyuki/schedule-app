@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { Alert, Autocomplete, Card, CardContent, Snackbar, TextField, Typography } from "@mui/material";
 import ScheduleForm from "./ScheduleForm";
 import { CalendarPlus, CheckCircle, Info, WarningCircle, XCircle } from "phosphor-react";
+import Loading from "./Loading";
 
 export default function Schedule() {
   const calendarRef = useRef();
@@ -14,7 +15,7 @@ export default function Schedule() {
   const [inputScheduleProf, setInputScheduleProf] = useState("");
 
   const [modalVisible, setModalVisible] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [loadingAutocomplete, setLoadingAutocomplete] = useState(false);
   const [events, setEvents] = useState([]);
   const [activeRange, setActiveRange] = useState({ start: "", end: "" });
 
@@ -23,6 +24,7 @@ export default function Schedule() {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [severityMessage, setSeverityMessage] = useState("");
+  const [loading, setLoading] = useState(false); 
 
   async function fetchProfessionals(search) {
     const sorting = { sortBy: "name", sortDir: "ASC" };
@@ -31,16 +33,16 @@ export default function Schedule() {
       sorting
     );
     setProfessionals(result.professionals);
-    setLoading(false);
+    setLoadingAutocomplete(false);
   }
 
   const changeInput = (input, callbackOptions, callbackFetch) => {
     if (!input) {
       callbackOptions([]);
-      setLoading(false);
+      setLoadingAutocomplete(false);
       return;
     } else {
-      setLoading(true);
+      setLoadingAutocomplete(true);
     }
 
     callbackFetch(input);
@@ -67,6 +69,7 @@ export default function Schedule() {
   };
 
   const fetchSessions = async (profId, activeWeek) => {
+    setLoading(true);
     await window.sessionAPI
       .findSessionsByProfessional(profId, activeWeek)
       .then((sessions) => {
@@ -78,6 +81,7 @@ export default function Schedule() {
           return { title, start, end, extendedProps: session };
         });
         setEvents(formattedEvents);
+        setLoading(false);
       });
   };
 
@@ -122,7 +126,7 @@ export default function Schedule() {
       setEvents([]);
     }
 
-    setLoading(false);
+    setLoadingAutocomplete(false);
   };
 
   const handleCalendarEventClick = (info) => {
@@ -133,6 +137,7 @@ export default function Schedule() {
 
   return (
     <div>
+      {loading && <Loading />}
       {modalVisible && (
         <ScheduleForm
           setModalVisible={setModalVisible}
@@ -144,6 +149,7 @@ export default function Schedule() {
           setSnackbarMessage={setSnackbarMessage}
           setSnackbarOpen={setSnackbarOpen}
           setSeverityMessage={setSeverityMessage}
+          setLoading={setLoading}
         />
       )}
       <Snackbar
@@ -186,7 +192,7 @@ export default function Schedule() {
               getOptionLabel={(option) => (option ? option.name : option)}
               onInputChange={(event, input) => setInputScheduleProf(input)}
               onChange={handleChangeScheduleProf}
-              loading={loading}
+              loading={loadingAutocomplete}
               loadingText="Pesquisando..."
               noOptionsText="Nenhum professional encontrado"
               renderInput={(params) => (

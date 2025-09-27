@@ -14,10 +14,21 @@ function formatDate(date) {
   return `${dia}${mes}${ano}${hora}${min}${seg}`;
 }
 
-function formatName (name) {
-    const split = name.split(" ");
-    return `${split[0]}_${split[split.length - 1]}`;
-  };
+function formatPDFName(name) {
+  const split = name.split(" ");
+  return `${split[0]}_${split[split.length - 1]}`;
+}
+
+function formatPatientName(name) {
+  const names = name.split(" ");
+  return names.reduce((acc, curr, ind) => {
+    if (ind === 0 || ind === 1 || ind === names.length-1 || curr === "de") {
+      return `${acc} ${curr}`;
+    } else {
+      return `${acc} ${curr.charAt(0).toUpperCase()}.`;
+    }
+  }, "");
+}
 
 function setFonts(doc) {
   doc.addFileToVFS("Montserrat-Regular.ttf", montserratNormal);
@@ -27,7 +38,7 @@ function setFonts(doc) {
   doc.addFont("Montserrat-Bold.ttf", "Montserrat", "bold");
 }
 
-function addText(doc, text, x, y, marginTop, marginBottom,) {
+function addText(doc, text, x, y, marginTop, marginBottom) {
   const pageHeight = doc.internal.pageSize.getHeight();
   const lineHeight = doc.getLineHeight() / doc.internal.scaleFactor;
 
@@ -107,7 +118,20 @@ function addParagraphJustified(doc, text, x, y, opts = {}) {
   return y;
 }
 
-function createReport(patient, data) {
+async function createReport(patient, data) {
+
+  return new Promise ((resolve, reject) => {
+    try {
+      downloadReport(patient, data);
+      resolve();
+    } catch (error) {
+      reject(error);
+    }
+  });
+}
+
+function downloadReport(patient, data) {
+
   const doc = new jsPDF({ unit: "mm"});
   setFonts(doc);
   const maxWidth = 190, marginLeft = 10, marginTop = 20, marginBottom = 20; 
@@ -118,13 +142,15 @@ function createReport(patient, data) {
 
   doc.setFont("Montserrat", "normal");
   doc.setFontSize(12);
+  const patientName = formatPatientName(patient.name);
   doc.text([
-    patient.name, 
+    patientName, 
     "CPF: "+patient.cpf, 
     "Telefone: "+patient.phone
   ], marginLeft + maxWidth + 1, 18, { align: "right" });
 
   let y = 45;
+
   data.forEach(element => {
     doc.setFont("Helvetica", "normal");
     doc.setFontSize(11);
@@ -149,12 +175,12 @@ function createReport(patient, data) {
   });
 
   const today = formatDate(new Date());
-  const patientName = patient.name
+  const patientPDFName = patient.name
     .toLowerCase()
     .normalize("NFD") 
     .replace(/[\u0300-\u036f]/g, "");
-  const formatPatientName = formatName(patientName);
-  const fileName = "relatorio_" + formatPatientName + "_"+ today +".pdf";
+  const formatPatientPDFName = formatPDFName(patientPDFName);
+  const fileName = "relatorio_" + formatPatientPDFName + "_"+ today +".pdf";
   doc.save(fileName);
   return true;
 }

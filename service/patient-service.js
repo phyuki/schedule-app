@@ -39,6 +39,7 @@ async function createPatient( patient ) {
 
 async function updatePatient( patientId, patient ) {
     try {
+      console.log(patient);
         const result = await Patient.update(
             patient,
             { where: {id: patientId} }

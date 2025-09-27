@@ -4,6 +4,7 @@ import { Controller, useForm } from "react-hook-form";
 import { DatePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
 import { withMask } from "use-mask-input";
+import { useEffect } from "react";
 
 export default function RegistrationProf({
   professional,
@@ -11,7 +12,8 @@ export default function RegistrationProf({
   setSnackbarOpen,
   setSeverityMessage,
   setSnackbarMessage,
-  fetchProfessionals
+  fetchProfessionals,
+  setLoading
 }) {
   const {
     control,
@@ -21,11 +23,11 @@ export default function RegistrationProf({
     formState: { errors },
   } = useForm({
     defaultValues: {
-      name: "",
-      address: "",
-      phone: "",
-      cpf: "",
-      birthDate: null,
+      name: professional?.name ?? "",
+      address: professional?.address ?? "",
+      phone: professional?.phone ?? "",
+      cpf: professional?.cpf ?? "",
+      birthDate: professional?.birthDate ? dayjs(professional?.birthDate) : null,
     },
   });
 
@@ -77,13 +79,16 @@ export default function RegistrationProf({
     let result = false,
       successMessage = "";
 
+    setLoading(true);
     if (!professional?.id) {
       result = await createProfessional(data);
       successMessage = `Paciente cadastrado com sucesso!`;
     } else {
+      data.birthDate = data.birthDate.format('YYYY-MM-DD');
       result = await updateProfessional(professional.id, data);
       successMessage = "Dados atualizados com sucesso!";
     }
+    setLoading(false);
 
     if (result) {
       setSnackbarMessage(successMessage);
@@ -218,11 +223,12 @@ export default function RegistrationProf({
               </Grid>
               <Grid
                 item
-                size={6}
+                size={12}
                 sx={{
                   display: "flex",
-                  justifyContent: "flex-end",
+                  justifyContent: "center",
                   alignItems: "center",
+                  my: -1
                 }}
               >
                 <input

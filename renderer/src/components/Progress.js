@@ -12,7 +12,8 @@ import {
 import { useEffect, useState } from "react";
 import ProgressForm from "./ProgressForm";
 import ProgressItem from "./ProgressItem";
-import { CheckCircle, FilePdf, Info, ListPlus, NotePencil, WarningCircle, XCircle } from "phosphor-react";
+import { CheckCircle, FilePdf, Info, NotePencil, WarningCircle, XCircle } from "phosphor-react";
+import Loading from "./Loading";
 
 export default function Progress({ patient }) {
   const [selected, setSelected] = useState(patient);
@@ -20,7 +21,7 @@ export default function Progress({ patient }) {
   const [history, setHistory] = useState([]);
 
   const [patients, setPatients] = useState([patient]);
-  const [loading, setLoading] = useState(false);
+  const [patientLoading, setPatientLoading] = useState(false);
 
   const [formContent, setFormContent] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
@@ -29,6 +30,8 @@ export default function Progress({ patient }) {
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [severityMessage, setSeverityMessage] = useState("");
 
+  const [loading, setLoading] = useState(false); 
+
   const [sorting, setSorting] = useState({
     page: 1,
     size: 3,
@@ -36,6 +39,7 @@ export default function Progress({ patient }) {
   });
 
   async function fetchProgress(patientId, page, size) {
+    setLoading(true);
     const history = await window.progressAPI.findProgressByPatient(
       patientId,
       page,
@@ -46,7 +50,7 @@ export default function Progress({ patient }) {
       if (sort.totalPages === history.totalPages) return sort;
       return { ...sort, totalPages: history.totalPages };
     });
-    console.log(history);
+    setLoading(false);
     if (history?.totalPages === 0) {
       setSnackbarMessage(`Não há registros cadastrados deste paciente!`);
       setSeverityMessage("error");
@@ -61,16 +65,16 @@ export default function Progress({ patient }) {
       sorting
     );
     setPatients(patients);
-    setLoading(false);
+    setPatientLoading(false);
   }
 
   useEffect(() => {
     if (!searchInput) {
       setPatients([]);
-      setLoading(false);
+      setPatientLoading(false);
       return;
     } else {
-      setLoading(true);
+      setPatientLoading(true);
     }
 
     updateOptions(searchInput);
@@ -89,7 +93,7 @@ export default function Progress({ patient }) {
 
   async function handleChange(event, selectedOption) {
     setSelected(selectedOption);
-    setLoading(false);
+    setPatientLoading(false);
     if (selectedOption) {
       setSorting((sort) => ({ ...sort, page: 1 }));
     } else {
@@ -105,8 +109,19 @@ export default function Progress({ patient }) {
       setSnackbarOpen(true);
       return;
     }
+    setLoading(true);
     const { patient, data } = await window.progressAPI.fetchAllProgress(selected.id);
-    return window.reportAPI.createReport(patient, data);
+    try {
+      await window.reportAPI.createReport(patient, data);
+      setSnackbarMessage(`Download efetuado com sucesso!`);
+      setSeverityMessage("success");
+    } catch (error) {
+      setSnackbarMessage(`Erro interno de servidor!`);
+      setSeverityMessage("error");
+      console.log(error);
+    }
+    setSnackbarOpen(true);
+    setLoading(false);
   }
 
   const refreshProgress = (patient) => {
@@ -147,11 +162,13 @@ export default function Progress({ patient }) {
 
   return (
     <>
+      {loading && <Loading />}
       {modalVisible && (
         <ProgressForm
           setModalVisible={setModalVisible}
           defaultContent={formContent ?? { patient: selected }}
           refreshProgress={refreshProgress}
+          setLoading={setLoading}
         />
       )}
       <Snackbar
@@ -191,7 +208,7 @@ export default function Progress({ patient }) {
           getOptionLabel={(option) => (option ? option.name : option)}
           onInputChange={(event, input) => setSearchInput(input)}
           onChange={handleChange}
-          loading={loading}
+          loading={patientLoading}
           noOptionsText={"Nenhum paciente encontrado"}
           renderInput={(params) => (
             <TextField

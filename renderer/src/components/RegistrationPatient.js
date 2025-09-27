@@ -4,6 +4,7 @@ import { Controller, useForm } from "react-hook-form";
 import { DatePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
 import { withMask } from "use-mask-input";
+import { useEffect } from "react";
 
 export default function RegistrationPatient({
   patient,
@@ -11,7 +12,8 @@ export default function RegistrationPatient({
   setSnackbarOpen,
   setSeverityMessage,
   setSnackbarMessage,
-  fetchPatients
+  fetchPatients,
+  setLoading
 }) {
   const {
     control,
@@ -72,13 +74,16 @@ export default function RegistrationPatient({
     let result = false,
       successMessage = "";
 
+    setLoading(true);
     if (!patient?.id) {
       result = await createPatient(data);
       successMessage = `Paciente cadastrado com sucesso!`;
     } else {
+      data.birthDate = data.birthDate.format('YYYY-MM-DD');
       result = await updatePatient(patient.id, data);
       successMessage = "Dados atualizados com sucesso!";
     }
+    setLoading(false);
 
     if (result) {
       setSnackbarMessage(successMessage);

@@ -1,13 +1,9 @@
 import {
-  Alert,
   Autocomplete,
-  Button,
   CardContent,
   CardHeader,
   Grid,
-  Snackbar,
   TextField,
-  Typography,
 } from "@mui/material";
 import Modal from "./Modal";
 import { DatePicker, TimeField } from "@mui/x-date-pickers";
@@ -28,6 +24,7 @@ export default function ScheduleForm({
   setSnackbarMessage,
   setSnackbarOpen,
   setSeverityMessage,
+  setLoading
 }) {
   const {
     register,
@@ -122,13 +119,13 @@ export default function ScheduleForm({
     } else {
       return true;
     }
-  };
+  }
 
   const validateDateField = (date) => {
     if (!date) return "Campo obrigatório";
     if (date.isBefore(dayjs(), "day")) return "Data inválida";
     else return true;
-  };
+  }
 
   const validateTimeRange = (time, startTime, endTime) => {
     if (!time) return "Campo obrigatório";
@@ -141,7 +138,7 @@ export default function ScheduleForm({
     } else {
       return "Horário inválido";
     }
-  };
+  }
 
   const validateSessions = (sessions, newSession) => {
     const { startTime, endTime } = newSession;
@@ -168,7 +165,7 @@ export default function ScheduleForm({
     }
 
     return true;
-  };
+  }
 
   const validateEqualFields = (data) => {
     const equalSubject = defaultContent.subject === data.subject;
@@ -202,6 +199,7 @@ export default function ScheduleForm({
     const message = toCreate ? "cadastrada" : "atualizada";
 
     if (validateSessions(result, session)) {
+      setLoading(true);
       const response = toCreate
         ? await window.sessionAPI.createSession(session)
         : await window.sessionAPI.updateSession(defaultContent.id, session);
@@ -215,7 +213,7 @@ export default function ScheduleForm({
           "Não foi possível marcar esta consulta - Tente Novamente!"
         );
         setSeverityMessage("error");
-        console.log(response);
+        setLoading(false);
       }
     } else {
       const errorMessage = { type: "manual", message: "Horário ocupado" };
@@ -263,6 +261,7 @@ export default function ScheduleForm({
   };
   
   const onDeleteSession = async () => {
+    setLoading(true);
     const result = await window.sessionAPI.deleteById(defaultContent.id);
     if (result) {
       setSnackbarMessage("Consulta excluída com sucesso!");
@@ -272,6 +271,7 @@ export default function ScheduleForm({
       setSnackbarMessage(
         "Não foi possível efetuar esta operação - Tente Novamente!"
       );
+      setLoading(false);
     }
     setSnackbarOpen(true);
     if (result) {

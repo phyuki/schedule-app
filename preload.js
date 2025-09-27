@@ -42,7 +42,7 @@ contextBridge.exposeInMainWorld('progressAPI', {
 })
 
 contextBridge.exposeInMainWorld('reportAPI', {
-  createReport: (patient, data) => createReport(patient, data),
+  createReport: async (patient, data) => await createReport(patient, data),
 })
 
 console.log('Preload carregado!')
