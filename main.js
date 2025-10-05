@@ -1,13 +1,15 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const path = require('path');
-const { sequelize, Session } = require('./models');
+const { sequelize } = require('./models');
 
 const isDev = !app.isPackaged;
+
+let mainWindow;
 
 async function createWindow() {
   await sequelize.sync()
   
-  const win = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 800,
     height: 500,
     webPreferences: {
@@ -22,10 +24,10 @@ async function createWindow() {
       ? 'http://localhost:3000'
       : `file://${path.join(__dirname, '../renderer/out/index.html')}`;
 
-  win.maximize()
-  win.loadURL(startURL);
+  mainWindow.maximize()
+  mainWindow.loadURL(startURL);
 
-  win.on('closed', () => (mainWindow = null));
+  mainWindow.on('closed', () => (mainWindow = null));
 }
 
 app.whenReady().then(() => {
@@ -44,3 +46,12 @@ app.whenReady().then(() => {
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') app.quit()
 })
+
+ipcMain.handle("select-folder", async () => {
+  const result = await dialog.showOpenDialog(mainWindow, {
+    properties: ["openDirectory"],
+  });
+
+  if (result.canceled) return null;
+  return result.filePaths[0];
+});

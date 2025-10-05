@@ -1,3 +1,5 @@
+const fs = require("fs");
+const path = require("path");
 const dayjs = require("dayjs");
 const { jsPDF } = require("jspdf");
 const montserratNormal = require("./fonts/Montserrat-normal.js");
@@ -118,11 +120,21 @@ function addParagraphJustified(doc, text, x, y, opts = {}) {
   return y;
 }
 
-async function createReport(patient, data) {
+async function downloadReport(patient, data, folderPath) {
 
   return new Promise ((resolve, reject) => {
     try {
-      downloadReport(patient, data);
+      const doc = createReport(patient, data, folderPath);
+      const today = formatDate(new Date());
+      const patientPDFName = patient.name
+        .toLowerCase()
+        .normalize("NFD") 
+        .replace(/[\u0300-\u036f]/g, "");
+      const formatPatientPDFName = formatPDFName(patientPDFName);
+      const fileName = "relatorio_" + formatPatientPDFName + "_"+ today +".pdf";
+      const filePath = path.join(folderPath, fileName);
+      const pdfBytes = doc.output("arraybuffer");
+      fs.writeFileSync(filePath, Buffer.from(pdfBytes));
       resolve();
     } catch (error) {
       reject(error);
@@ -130,7 +142,7 @@ async function createReport(patient, data) {
   });
 }
 
-function downloadReport(patient, data) {
+function createReport(patient, data) {
 
   const doc = new jsPDF({ unit: "mm"});
   setFonts(doc);
@@ -174,17 +186,9 @@ function downloadReport(patient, data) {
     y = addParagraphJustified(doc, element.subject, marginLeft, y) + 5;
   });
 
-  const today = formatDate(new Date());
-  const patientPDFName = patient.name
-    .toLowerCase()
-    .normalize("NFD") 
-    .replace(/[\u0300-\u036f]/g, "");
-  const formatPatientPDFName = formatPDFName(patientPDFName);
-  const fileName = "relatorio_" + formatPatientPDFName + "_"+ today +".pdf";
-  doc.save(fileName);
-  return true;
+  return doc;
 }
 
 module.exports = { 
-  createReport 
+  downloadReport 
 };

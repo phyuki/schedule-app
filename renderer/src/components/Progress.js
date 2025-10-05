@@ -102,6 +102,11 @@ export default function Progress({ patient }) {
     }
   }
 
+  async function selectFolder() {
+    const folderPath = await window.electronAPI.selectFolder();
+    return folderPath;
+  }
+
   async function downloadProgress() {
     if (!selected) {
       setSnackbarMessage(`Selecione um paciente!`);
@@ -109,19 +114,22 @@ export default function Progress({ patient }) {
       setSnackbarOpen(true);
       return;
     }
-    setLoading(true);
-    const { patient, data } = await window.progressAPI.fetchAllProgress(selected.id);
-    try {
-      await window.reportAPI.createReport(patient, data);
-      setSnackbarMessage(`Download efetuado com sucesso!`);
-      setSeverityMessage("success");
-    } catch (error) {
-      setSnackbarMessage(`Erro interno de servidor!`);
-      setSeverityMessage("error");
-      console.log(error);
+    const folderPath = await selectFolder();
+    if (folderPath) {
+      setLoading(true);
+      const { patient, data } = await window.progressAPI.fetchAllProgress(selected.id);
+      try {
+        await window.reportAPI.downloadReport(patient, data, folderPath);
+        setSnackbarMessage(`Download efetuado com sucesso!`);
+        setSeverityMessage("success");
+      } catch (error) {
+        setSnackbarMessage(`Erro interno de servidor!`);
+        setSeverityMessage("error");
+        console.log(error);
+      }
+      setSnackbarOpen(true);
+      setLoading(false);
     }
-    setSnackbarOpen(true);
-    setLoading(false);
   }
 
   const refreshProgress = (patient) => {
@@ -187,7 +195,6 @@ export default function Progress({ patient }) {
             boxShadow: 2,
             minWidth: "200px",
             alignItems: "center",
-            marginRight: 2,
           }}
           iconMapping={{
             success: <CheckCircle sx={{ color: "green" }} size={40} />,

@@ -21,7 +21,7 @@ export default function Loading() {
           bgcolor: 'white'
         }}
       >
-        <CircularProgress color="inherit" size={46}/>
+        <CircularProgress color="inherit" size={46} thickness={5}/>
       </Box>
     </Box>
   );
